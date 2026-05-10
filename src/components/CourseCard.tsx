@@ -20,7 +20,7 @@ const CourseCard = ({ course }: { course: Course }) => {
         .select('id')
         .eq('user_id', user.id)
         .eq('course_id', course.id)
-        .single();
+        .maybeSingle();
       
       if (data) setIsSaved(true);
     };
