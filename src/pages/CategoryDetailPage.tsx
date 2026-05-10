@@ -26,7 +26,7 @@ const CategoryDetailPage = () => {
         .from('categories')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (catError) {
         console.error('Category fetch failed', catError);
