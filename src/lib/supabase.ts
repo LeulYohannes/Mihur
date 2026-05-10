@@ -5,9 +5,14 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: true,  // This is key
+    persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    storage: localStorage,  // Use localStorage instead of cookies
+    storage: localStorage,
   },
+});
+
+// Log auth events for debugging (remove later)
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log('🔐 Supabase Auth Event:', event, session?.user?.email);
 });

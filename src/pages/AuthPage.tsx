@@ -16,7 +16,10 @@ const AuthPage = () => {
 
     try {
       if (isLogin) {
-        // Sign In
+        // Clear any existing session first
+        await supabase.auth.signOut();
+        
+        // Sign in
         const { error } = await supabase.auth.signInWithPassword({ 
           email, 
           password 
@@ -24,11 +27,11 @@ const AuthPage = () => {
         
         if (error) throw error;
         
-        // Force full page reload to ensure session is picked up by AuthContext
+        // Force hard reload to home page
         window.location.href = '/';
         
       } else {
-        // Sign Up
+        // Sign up
         const { error } = await supabase.auth.signUp({ 
           email, 
           password,
@@ -40,14 +43,11 @@ const AuthPage = () => {
         if (error) throw error;
         
         alert('Check your email for the confirmation link!');
-        
-        // Clear form after successful signup
         setEmail('');
         setPassword('');
       }
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
