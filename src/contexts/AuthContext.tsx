@@ -1,13 +1,13 @@
-// src/contexts/AuthContext.tsx
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
-// Define what data our context will hold
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   signOut: () => Promise<void>;
+  setUser: (user: User | null) => void;
+  setSession: (session: Session | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,34 +17,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // 1. Get the session when the app loads
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('📦 Initial session loaded:', session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
     });
 
-    // 2. Listen for changes (like when a user logs in or out)
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('🔄 Auth state changed:', _event, session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
     });
 
-    // Cleanup the listener when the app closes
     return () => subscription.unsubscribe();
   }, []);
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    localStorage.removeItem('sb-auth-token');
+    setSession(null);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, signOut }}>
+    <AuthContext.Provider value={{ session, user, signOut, setUser, setSession }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to easily use this context in other files
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
