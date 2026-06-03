@@ -1,8 +1,8 @@
-# EduFinder – Documentation
+# Mihur – Documentation
 
 ## 1. Overview
 
-**EduFinder** is a web-based platform that helps learners discover and save free online courses from multiple providers (Coursera, edX, Khan Academy, FutureLearn). It offers a questionnaire‑based personalization, category browsing, and a “My Learning” area where users can bookmark courses for later.
+**Mihur** is a web-based platform that helps learners discover and save free online courses from multiple providers (Coursera, edX, Khan Academy, FutureLearn). It offers a questionnaire‑based personalization, category browsing, and a “My Learning” area where users can bookmark courses for later.
 
 The application is built with **React (TypeScript)** and **Supabase** as the backend (authentication + database). No internal course hosting – users are redirected to the original provider.
 
@@ -35,7 +35,7 @@ The application is built with **React (TypeScript)** and **Supabase** as the bac
 ## 4. Project Structure
 
 ```
-EduFinder/
+Mihur/
 ├── .env.local                 # Supabase keys (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
 ├── .gitignore
 ├── package.json
@@ -148,7 +148,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 1. **Clone the repository**
    ```bash
    git clone <repo-url>
-   cd EduFinder
+  cd Mihur
    ```
 
 2. **Install dependencies**

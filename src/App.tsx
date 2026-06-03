@@ -12,11 +12,14 @@ import CategoryDetailPage from './pages/CategoryDetailPage';
 import QuestionnairePage from './pages/Questionaire';
 import AuthPage from './pages/AuthPage';
 import MyLearningPage from './pages/MyLearningPage';
+import RoadmapPage from './pages/RoadmapPage';
+
+
 
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-main text-primary">
+      <div className="min-h-screen bg-surface-dim text-on-surface">
         <Navbar />
 
         <main className="pt-24">
@@ -28,18 +31,19 @@ export default function App() {
               <Route path="/questionnaire" element={<QuestionnairePage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/my-learning" element={<MyLearningPage />} />
+             <Route path="/roadmap" element={<RoadmapPage />} />
             </Routes>
           </AnimatePresence>
         </main>
 
-        <footer className="bg-main border-t border-border-subtle py-20">
+        <footer className="bg-surface-dim border-t border-outline-variant py-20">
           <div className="layout-container flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
               <Link to="/" className="text-xl font-semibold text-primary tracking-tight">
-                EduFinder
+                Mihur
               </Link>
               <p className="text-muted text-xs uppercase tracking-[0.2em] mt-2">
-                © 2026 EduFinder • Built for focused learning
+                © 2026 Mihur • Built for focused learning
               </p>
             </div>
 

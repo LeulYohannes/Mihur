@@ -18,8 +18,27 @@ const HomePage = () => {
   
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+  
 
   useEffect(() => {
+    // Add this at the top of HomePage component
+const testSupabase = async () => {
+  console.log('Testing Supabase connection...');
+  const { data: cats, error: catErr } = await supabase.from('categories').select('id').limit(1);
+  console.log('Categories test:', catErr ? 'ERROR' : 'OK', catErr?.message);
+  
+  const { data: coursesTest, error: courseErr } = await supabase.from('courses').select('id').limit(1);
+  console.log('Courses test:', courseErr ? 'ERROR' : 'OK', courseErr?.message);
+  
+  const { data: profilesTest, error: profErr } = await supabase.from('user_profiles').select('user_id').limit(1);
+  console.log('User_profiles test:', profErr ? 'ERROR' : 'OK', profErr?.message);
+  
+  const { data: savedTest, error: savedErr } = await supabase.from('saved_courses').select('id').limit(1);
+  console.log('Saved_courses test:', savedErr ? 'ERROR' : 'OK', savedErr?.message);
+};
+
+// Call it inside useEffect, after fetchData or before
+testSupabase();
     const fetchData = async () => {
       // 1. Fetch Categories and Courses
       const [catResponse, courseResponse] = await Promise.all([
@@ -98,11 +117,15 @@ const HomePage = () => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       {/* Hero Section */}
-      <section className="pt-48 pb-32 px-8 max-w-7xl mx-auto text-center">
+      <section className="pt-48 pb-32 px-8 max-w-7xl mx-auto text-center relative">
+        <div className="hero-decor">
+          <div className="sunset-circle" />
+          <div className="sunset-blob" />
+        </div>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-8xl font-bold tracking-tight mb-8 max-w-5xl mx-auto leading-[0.95]"
+          className="display-lg font-playfair tracking-tight mb-8 max-w-5xl mx-auto leading-[0.95] text-on-surface"
         >
           Find the Best Free Courses, Fast
         </motion.h1>
@@ -110,7 +133,7 @@ const HomePage = () => {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-lg md:text-2xl text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed"
+          className="body-lg text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed"
         >
           Discover thousands of free courses from Coursera, edX, Khan Academy, and FutureLearn in one place.
         </motion.p>

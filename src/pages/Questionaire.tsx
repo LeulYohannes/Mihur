@@ -133,23 +133,23 @@ const QuestionnairePage = () => {
       className="pt-48 pb-32 px-8 max-w-4xl mx-auto"
     >
       <div className="mb-12">
-        <Link to="/" className="text-primary hover:underline flex items-center gap-2 font-semibold">
+        <Link to="/" className="label-md text-on-surface-variant flex items-center gap-2 font-semibold">
           ← Back to Home
         </Link>
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight mt-6 mb-2">Learning Questionnaire</h1>
-        <p className="text-on-surface-variant text-lg max-w-2xl">
+        <h1 className="headline-lg font-playfair mt-6 mb-2">Learning Questionnaire</h1>
+        <p className="body-md text-on-surface-variant max-w-2xl">
           Answer a few quick questions and we’ll personalize your course recommendations right away.
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="bg-surface-container-high rounded-3xl p-8 shadow-md border border-outline-variant/20 space-y-6">
+      <form onSubmit={onSubmit} className="glass-card rounded-lg p-8 shadow-md border border-outline-variant/20 space-y-6">
         <div>
           <label className="block text-sm font-bold mb-2" htmlFor="category">Top area of interest</label>
           <select
             id="category"
             value={answers.category}
             onChange={(e) => setAnswers((prev) => ({ ...prev, category: e.target.value }))}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
             <option value="">Select a category</option>
@@ -171,7 +171,7 @@ const QuestionnairePage = () => {
             id="skillLevel"
             value={answers.skillLevel}
             onChange={(e) => setAnswers((prev) => ({ ...prev, skillLevel: e.target.value as SurveyAnswers['skillLevel'] }))}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
             <option value="">Select level</option>
@@ -190,7 +190,7 @@ const QuestionnairePage = () => {
             onChange={(e) => setAnswers((prev) => ({ ...prev, weeklyHours: Number(e.target.value) }))}
             min={1}
             max={40}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           />
         </div>
@@ -201,7 +201,7 @@ const QuestionnairePage = () => {
             id="reason"
             value={answers.reason}
             onChange={(e) => setAnswers((prev) => ({ ...prev, reason: e.target.value as SurveyAnswers['reason'] }))}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
             <option value="">Select reason</option>
@@ -235,7 +235,7 @@ const QuestionnairePage = () => {
             value={answers.goal}
             onChange={(e) => setAnswers((prev) => ({ ...prev, goal: e.target.value }))}
             rows={4}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             placeholder="e.g. build a portfolio project, land a job, improve data analytics"
             required
           />
@@ -245,7 +245,7 @@ const QuestionnairePage = () => {
           <button 
             type="submit" 
             disabled={saving}
-            className="w-full md:w-auto px-8 py-3 rounded-xl primary-gradient text-on-primary font-bold transition-all hover:opacity-95 disabled:opacity-70 flex items-center justify-center min-w-[160px]"
+            className="w-full md:w-auto px-8 py-3 rounded-xl btn-primary transition-all disabled:opacity-70 flex items-center justify-center min-w-[160px]"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save Answers'}
           </button>
@@ -253,7 +253,7 @@ const QuestionnairePage = () => {
           <button 
             type="button" 
             onClick={reset} 
-            className="w-full md:w-auto px-8 py-3 rounded-xl bg-surface-container-highest border border-outline/20 text-on-surface font-medium hover:bg-surface-bright transition-all"
+            className="w-full md:w-auto px-8 py-3 rounded-xl btn-secondary"
           >
             Clear Form
           </button>

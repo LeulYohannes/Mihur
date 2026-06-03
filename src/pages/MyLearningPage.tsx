@@ -66,12 +66,12 @@ const MyLearningPage = () => {
   if (!user) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-48 pb-32 px-8 max-w-2xl mx-auto text-center min-h-screen">
-        <div className="bg-surface-container-high rounded-3xl p-12 shadow-xl border border-outline-variant/20">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-8 h-8 text-primary" />
+        <div className="glass-card rounded-lg p-12 shadow-xl border border-outline-variant/20">
+          <div className="w-16 h-16 bg-primary-container/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8 text-on-primary" />
           </div>
-          <h2 className="text-3xl font-bold mb-4 text-on-surface">Sign in to view saved courses</h2>
-          <Link to="/auth" className="px-8 py-4 rounded-xl primary-gradient text-on-primary font-bold active:scale-95 transition-all inline-block mt-4">
+          <h2 className="headline-md font-playfair mb-4 text-on-surface">Sign in to view saved courses</h2>
+          <Link to="/auth" className="btn-primary inline-block mt-4">
             Sign In / Sign Up
           </Link>
         </div>

@@ -59,8 +59,8 @@ const AuthPage = () => {
       className="pt-48 pb-32 px-4"
     >
       <div className="max-w-md mx-auto">
-        <div className="bg-surface-container-high rounded-2xl p-8 shadow-xl border border-outline/20">
-          <h1 className="text-3xl font-bold text-center mb-8">
+        <div className="glass-card rounded-lg p-8 shadow-xl border border-outline/20">
+          <h1 className="headline-md font-playfair text-center mb-8">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
 
@@ -72,7 +72,7 @@ const AuthPage = () => {
 
           <form onSubmit={handleAuth} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block label-md mb-2">
                 Email
               </label>
               <input
@@ -80,14 +80,14 @@ const AuthPage = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
                 placeholder="you@example.com"
                 disabled={loading}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block label-md mb-2">
                 Password
               </label>
               <input
@@ -95,7 +95,7 @@ const AuthPage = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
                 placeholder="••••••••"
                 disabled={loading}
               />
@@ -104,7 +104,7 @@ const AuthPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-xl btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
             </button>

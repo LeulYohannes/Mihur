@@ -21,8 +21,8 @@ const Navbar = () => {
   return (
     <header className="navbar fixed top-0 left-0 right-0 z-50">
       <div className="layout-container flex items-center justify-between gap-6">
-        <Link to="/" className="text-primary font-semibold text-lg">
-          EduFinder
+        <Link to="/" className="text-primary font-playfair headline-md">
+          Mihur
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">

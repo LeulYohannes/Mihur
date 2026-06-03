@@ -64,7 +64,7 @@ const CourseCard = ({ course }: { course: Course }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       whileHover={{ y: -8 }}
-      className="bg-surface-container-highest rounded-2xl overflow-hidden ghost-border group transition-all duration-300 editorial-shadow relative flex flex-col h-full"
+      className="glass-card overflow-hidden rounded-lg group transition-all duration-300 relative flex flex-col h-full"
     >
       <div className="aspect-video relative overflow-hidden shrink-0">
         <img
@@ -74,7 +74,7 @@ const CourseCard = ({ course }: { course: Course }) => {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[0.6875rem] uppercase tracking-wider font-bold shadow-md">
+          <span className="px-3 py-1 rounded-full chip text-on-secondary-container uppercase tracking-wider">
             {course.level}
           </span>
         </div>
@@ -91,21 +91,21 @@ const CourseCard = ({ course }: { course: Course }) => {
         </button>
       </div>
 
-      <div className="p-6 flex flex-col flex-grow">
+        <div className="p-6 flex flex-col flex-grow">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-bold">
+          <span className="label-md uppercase tracking-[0.06em] text-on-surface-variant">
             {course.provider}
           </span>
           <div className="flex items-center gap-1.5 text-on-surface-variant">
-            <Clock className="w-3.5 h-3.5" />
-            <span className="text-[0.6875rem]">{course.duration}</span>
+            <Clock className="w-4 h-4" />
+            <span className="caption">{course.duration}</span>
           </div>
         </div>
 
-        <h3 className="text-xl font-bold mb-3 leading-tight text-on-surface group-hover:text-primary transition-colors">
+        <h3 className="headline-md font-playfair mb-3 leading-tight text-on-surface transition-colors">
           {course.title}
         </h3>
-        <p className="text-sm text-on-surface-variant mb-6 line-clamp-2 leading-relaxed flex-grow">
+        <p className="body-md text-on-surface-variant mb-6 line-clamp-2 leading-relaxed flex-grow">
           {course.description}
         </p>
 
@@ -113,7 +113,7 @@ const CourseCard = ({ course }: { course: Course }) => {
           href={course.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full py-3 rounded-xl bg-surface-container-high border border-outline/20 text-primary font-bold hover:bg-primary hover:text-on-primary transition-all duration-200 block text-center mt-auto"
+          className="btn-primary block text-center mt-auto"
         >
           View Course
         </a>

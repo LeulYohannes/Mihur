@@ -11,14 +11,14 @@ const CategoryCard = ({ category }: { category: Category }) => {
   return (
     <Link to={`/category/${category.id}`}>
       <motion.div
-        whileHover={{ scale: 1.05, backgroundColor: 'var(--color-surface-bright)' }}
-        className="bg-surface-container-highest p-8 rounded-2xl ghost-border cursor-pointer text-center group transition-colors h-full"
+        whileHover={{ scale: 1.03 }}
+        className="glass-card p-6 rounded-lg cursor-pointer text-center group transition-all h-full flex flex-col items-center"
       >
-        <div className="w-12 h-12 bg-primary-container/20 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-          <Icon className="w-6 h-6 text-primary" />
+        <div className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 accent-gradient group-hover:scale-105 transition-transform">
+          <Icon className="w-6 h-6 text-on-primary" />
         </div>
-        <span className="font-medium text-on-surface block mb-2">{category.name}</span>
-        <p className="text-xs text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity line-clamp-2">
+        <span className="label-md text-on-surface block mb-2">{category.name}</span>
+        <p className="caption text-on-surface-variant opacity-80 text-center line-clamp-2">
           {category.description}
         </p>
       </motion.div>

@@ -1,7 +1,7 @@
-# Project Context: EduFinder (Full Specification)
+# Project Context: Mihur (Full Specification)
 
 ## 1. Project Overview
-[cite_start]**EduFinder** is a web-based platform designed to centralize and personalize the discovery of free online courses[cite: 2, 30]. [cite_start]It targets high school and early college learners, helping them navigate information overload by providing structured learning paths[cite: 39, 52].
+[cite_start]**Mihur** is a web-based platform designed to centralize and personalize the discovery of free online courses[cite: 2, 30]. [cite_start]It targets high school and early college learners, helping them navigate information overload by providing structured learning paths[cite: 39, 52].
 
 ## 2. Core Features
 * [cite_start]**Questionnaire-Based Recommendations:** A user-friendly questionnaire to identify interests, skill levels, and goals[cite: 55, 98].

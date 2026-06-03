@@ -91,17 +91,17 @@ const CategoryDetailPage = () => {
       className="pt-48 pb-32 px-8 max-w-7xl mx-auto min-h-screen"
     >
       <div className="mb-16">
-        <Link to="/categories" className="text-primary hover:underline flex items-center gap-2 mb-6 font-semibold">
+        <Link to="/categories" className="label-md text-on-surface-variant flex items-center gap-2 mb-6 font-semibold">
           <ArrowLeft className="w-5 h-5" />
           All Categories
         </Link>
         <div className="flex items-center gap-6 mb-6">
-          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-            <Icon className="w-8 h-8 text-primary" />
+          <div className="w-16 h-16 rounded-lg accent-gradient flex items-center justify-center shrink-0">
+            <Icon className="w-8 h-8 text-on-primary" />
           </div>
           <div>
-            <h1 className="text-6xl font-bold tracking-tight mb-2">{category.name}</h1>
-            <p className="text-xl text-on-surface-variant max-w-2xl">
+            <h1 className="headline-lg font-playfair mb-2">{category.name}</h1>
+            <p className="body-md text-on-surface-variant max-w-2xl">
               {category.description}
             </p>
           </div>

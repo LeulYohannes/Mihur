@@ -50,11 +50,11 @@ const CategoriesPage = () => {
       className="pt-48 pb-32 px-8 max-w-7xl mx-auto min-h-screen"
     >
       <div className="mb-16">
-        <Link to="/" className="text-primary hover:underline flex items-center gap-2 mb-6 font-semibold">
+        <Link to="/" className="label-md text-on-surface-variant flex items-center gap-2 mb-6 font-semibold">
           <ArrowLeft className="w-5 h-5" /> Back to Home
         </Link>
-        <h1 className="text-6xl font-bold tracking-tight mb-4">All Categories</h1>
-        <p className="text-xl text-on-surface-variant max-w-2xl">
+        <h1 className="headline-lg font-playfair tracking-tight mb-4">All Categories</h1>
+        <p className="body-md text-on-surface-variant max-w-2xl">
           Explore our complete catalog of free educational resources across every major discipline.
         </p>
       </div>
