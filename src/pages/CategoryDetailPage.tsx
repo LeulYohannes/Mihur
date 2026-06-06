@@ -55,7 +55,7 @@ const CategoryDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="pt-48 flex justify-center min-h-screen">
+      <div className="pt-32 flex justify-center min-h-screen">
         <Loader2 className="animate-spin w-10 h-10 text-primary" />
       </div>
     );
@@ -63,8 +63,8 @@ const CategoryDetailPage = () => {
 
   if (error) {
     return (
-      <div className="pt-48 flex justify-center px-8 text-center min-h-screen">
-        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-10 text-red-200">
+      <div className="pt-32 flex justify-center px-4 text-center min-h-screen w-full">
+        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-8 text-red-200">
           <h2 className="text-2xl font-bold mb-3">Unable to load this category</h2>
           <p>{error}</p>
         </div>
@@ -74,8 +74,8 @@ const CategoryDetailPage = () => {
 
   if (!category) {
     return (
-      <div className="pt-48 pb-32 px-8 text-center min-h-screen">
-        <h1 className="text-4xl font-bold mb-4">Category not found</h1>
+      <div className="page-section text-center min-h-screen">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">Category not found</h1>
         <Link to="/categories" className="text-primary hover:underline">View all categories</Link>
       </div>
     );
@@ -88,14 +88,14 @@ const CategoryDetailPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="pt-48 pb-32 px-8 max-w-7xl mx-auto min-h-screen"
+      className="page-section max-w-7xl mx-auto min-h-screen"
     >
       <div className="mb-16">
         <Link to="/categories" className="label-md text-on-surface-variant flex items-center gap-2 mb-6 font-semibold">
           <ArrowLeft className="w-5 h-5" />
           All Categories
         </Link>
-        <div className="flex items-center gap-6 mb-6">
+        <div className="flex flex-col sm:flex-row items-center gap-6 mb-6 text-left sm:text-left">
           <div className="w-16 h-16 rounded-lg accent-gradient flex items-center justify-center shrink-0">
             <Icon className="w-8 h-8 text-on-primary" />
           </div>

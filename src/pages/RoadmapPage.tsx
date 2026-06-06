@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Circle, Link, Loader2, Plus, TrendingUp } from 'lucide-react';
+import { CheckCircle, Circle, Loader2, Plus, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -141,12 +142,12 @@ const RoadmapPage = () => {
     setGenerating(false);
   };
 
-  if (loading) return <div className="pt-48 flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+  if (loading) return <div className="pt-32 flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
 
   if (!user) {
     return (
-      <div className="pt-48 text-center px-8">
-        <div className="max-w-md mx-auto bg-surface-container-high rounded-3xl p-12">
+      <div className="pt-32 text-center px-4">
+        <div className="max-w-md mx-auto bg-surface-container-high rounded-3xl p-8">
           <h2 className="text-3xl font-bold mb-4">Sign in to access your roadmap</h2>
           <Link to="/auth" className="btn-primary">Sign In</Link>
         </div>
@@ -155,8 +156,8 @@ const RoadmapPage = () => {
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-48 pb-32 px-8 max-w-6xl mx-auto min-h-screen">
-      <div className="flex justify-between items-center mb-12">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-6xl mx-auto min-h-screen">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
         <div>
           <h1 className="headline-lg font-playfair tracking-tight mb-2">Learning Roadmaps</h1>
           <p className="body-md text-on-surface-variant">Track your progress toward your learning goals</p>
@@ -164,7 +165,7 @@ const RoadmapPage = () => {
         <button 
           onClick={generateRoadmap}
           disabled={generating}
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
         >
           {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
           Generate New Roadmap

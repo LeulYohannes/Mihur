@@ -102,13 +102,13 @@ const QuestionnairePage = () => {
   };
 
   if (loading) {
-    return <div className="pt-48 min-h-screen flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+    return <div className="pt-32 min-h-screen flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
   }
 
   // Protect the route: Don't let them fill it out if they aren't logged in
   if (!user) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-48 pb-32 px-8 max-w-2xl mx-auto text-center min-h-screen">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-2xl mx-auto text-center min-h-screen">
         <div className="bg-surface-container-high rounded-3xl p-12 shadow-xl border border-outline-variant/20">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8 text-primary" />
@@ -130,7 +130,7 @@ const QuestionnairePage = () => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className="pt-48 pb-32 px-8 max-w-4xl mx-auto"
+      className="page-section max-w-4xl mx-auto"
     >
       <div className="mb-12">
         <Link to="/" className="label-md text-on-surface-variant flex items-center gap-2 font-semibold">

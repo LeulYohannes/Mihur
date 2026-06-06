@@ -56,7 +56,7 @@ const AuthPage = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="pt-48 pb-32 px-4"
+      className="page-section px-4"
     >
       <div className="max-w-md mx-auto">
         <div className="glass-card rounded-lg p-8 shadow-xl border border-outline/20">

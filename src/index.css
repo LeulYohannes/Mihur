@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface-dim: #2E2E41; /* Dark background requested */
+  --color-surface-dim: #2E2E41;
   --color-surface-bright: #363646;
   --color-surface-container-lowest: #222230;
   --color-surface-container-low: #262634;
@@ -9,15 +9,15 @@
   --color-surface-container-high: #333348;
   --color-surface-container-highest: #3b3b56;
   
-  --color-on-surface: #F6F5F4; /* light text */
+  --color-on-surface: #F6F5F4;
   --color-on-surface-variant: #cfc9c6;
   
-  --color-primary: #FB6D10; /* main warm accent */
+  --color-primary: #FB6D10;
   --color-primary-dim: #d55a0d;
   --color-primary-container: #ff8b3a;
   --color-on-primary: #ffffff;
   
-  --color-secondary: #EB3E1B; /* secondary warm accent */
+  --color-secondary: #EB3E1B;
   --color-secondary-container: #ff6a3a;
   --color-on-secondary-container: #ffffff;
   
@@ -231,7 +231,22 @@ body {
 .rounded-lg { border-radius: 1rem; }
 .rounded-xl { border-radius: 1.5rem; }
 
-/* Sunset decorative elements */
+/* ========== SUNSET DECORATIONS (FIXED – always visible) ========== */
+.hero-decor {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+  isolation: isolate;
+}
+
+/* Ensure hero section creates a stacking context */
+section.relative {
+  isolation: isolate;
+}
+
+/* Base sunset circle */
 .sunset-circle {
   position: absolute;
   width: 680px;
@@ -240,19 +255,53 @@ body {
   filter: blur(60px);
   right: -180px;
   top: -200px;
-  background: var(--sunset-gradient, linear-gradient(135deg, #FB6D10 0%, #EB3E1B 50%, #2E2E41 100%));
-  opacity: 0.75;
-  pointer-events: none;
+  background: linear-gradient(135deg, #FB6D10 0%, #EB3E1B 50%, #2E2E41 100%);
+  opacity: 0.65;
+  z-index: -1;
 }
 
-.hero-decor {
+/* Additional bubbles */
+.sunset-bubble-1 {
   position: absolute;
-  inset: 0;
-  display: block;
-  pointer-events: none;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251,109,16,0.4), rgba(235,62,27,0.2));
+  filter: blur(70px);
+  left: -150px;
+  bottom: -100px;
+  opacity: 0.5;
+  z-index: -1;
 }
 
-.sunset-blob {
+.sunset-bubble-2 {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,179,122,0.3), rgba(251,109,16,0.1));
+  filter: blur(55px);
+  right: 15%;
+  top: 40%;
+  opacity: 0.45;
+  z-index: -1;
+}
+
+.sunset-bubble-3 {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(235,62,27,0.2);
+  filter: blur(40px);
+  left: 5%;
+  bottom: 15%;
+  opacity: 0.35;
+  z-index: -1;
+}
+
+/* Original sunset blob */
+.hero-decor .sunset-blob {
   position: absolute;
   width: 420px;
   height: 420px;
@@ -261,10 +310,11 @@ body {
   filter: blur(48px);
   left: -90px;
   bottom: -120px;
-  opacity: 0.85;
+  opacity: 0.7;
+  z-index: -1;
 }
 
-/* Glass card base following DESIGN.md */
+/* Glass card base */
 .glass-card {
   background: rgba(255,255,255,0.03);
   backdrop-filter: blur(12px);
@@ -309,11 +359,54 @@ body {
 .text-accent { color: var(--color-primary); }
 
 @media (max-width: 768px) {
-  .display-lg { font-size: 28px; line-height: 36px; }
-  .headline-lg { font-size: 28px; }
+  .display-lg { font-size: 34px; line-height: 42px; }
+  .headline-lg { font-size: 28px; line-height: 36px; }
+  .headline-md { font-size: 20px; line-height: 28px; }
+  .sunset-circle {
+    width: 520px;
+    height: 520px;
+    right: -130px;
+    top: -140px;
+    filter: blur(50px);
+    opacity: 0.55;
+  }
+  .sunset-bubble-1 {
+    width: 320px;
+    height: 320px;
+    left: -80px;
+    bottom: -60px;
+    filter: blur(45px);
+  }
+  .hero-decor .sunset-blob {
+    width: 320px;
+    height: 320px;
+    left: -60px;
+    bottom: -80px;
+    filter: blur(40px);
+    opacity: 0.6;
+  }
+  .sunset-bubble-2 {
+    width: 240px;
+    height: 240px;
+    right: 5%;
+    top: 30%;
+    filter: blur(35px);
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
-/* End design system */
+.page-section {
+  padding: 3rem 1rem 2rem;
+}
+
+@media (min-width: 768px) {
+  .page-section {
+    padding: 4.5rem 2rem 3rem;
+  }
+}
 
 ::-webkit-scrollbar-corner {
   background: transparent;

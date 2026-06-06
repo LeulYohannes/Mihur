@@ -13,6 +13,7 @@ import QuestionnairePage from './pages/Questionaire';
 import AuthPage from './pages/AuthPage';
 import MyLearningPage from './pages/MyLearningPage';
 import RoadmapPage from './pages/RoadmapPage';
+import { GraduationCap } from 'lucide-react';
 
 
 
@@ -38,15 +39,15 @@ export default function App() {
 
         <footer className="bg-surface-dim border-t border-outline-variant py-20">
           <div className="layout-container flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <Link to="/" className="text-xl font-semibold text-primary tracking-tight">
-                Mihur
-              </Link>
-              <p className="text-muted text-xs uppercase tracking-[0.2em] mt-2">
-                © 2026 Mihur • Built for focused learning
-              </p>
-            </div>
-
+          <div>
+  <Link to="/" className="flex items-center gap-2 text-primary font-semibold text-xl tracking-tight">
+    <GraduationCap className="w-6 h-6" />
+    <span>Mihur</span>
+  </Link>
+  <p className="text-muted text-xs uppercase tracking-[0.2em] mt-2">
+    © 2026 Mihur • Built for focused learning
+  </p>
+</div>
             <div className="flex flex-wrap gap-6 text-sm text-secondary">
               <Link to="/categories" className="nav-link">
                 Categories

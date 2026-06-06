@@ -28,13 +28,13 @@ const CategoriesPage = () => {
   }, []);
 
   if (loading) {
-    return <div className="pt-48 flex justify-center"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
+    return <div className="pt-32 flex justify-center"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
   }
 
   if (error) {
     return (
-      <div className="pt-48 flex justify-center px-8 text-center">
-        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-10 text-red-200">
+      <div className="pt-32 flex justify-center px-4 text-center w-full">
+        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-8 text-red-200">
           <h2 className="text-2xl font-bold mb-3">Unable to load categories</h2>
           <p>{error}</p>
         </div>
@@ -47,7 +47,7 @@ const CategoriesPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="pt-48 pb-32 px-8 max-w-7xl mx-auto min-h-screen"
+      className="page-section max-w-7xl mx-auto min-h-screen"
     >
       <div className="mb-16">
         <Link to="/" className="label-md text-on-surface-variant flex items-center gap-2 mb-6 font-semibold">
@@ -59,7 +59,7 @@ const CategoriesPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {categories.map((cat) => (
           <CategoryCard key={cat.id} category={cat} />
         ))}

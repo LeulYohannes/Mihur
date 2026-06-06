@@ -1,5 +1,6 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { GraduationCap } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Explore', to: '/' },
@@ -21,10 +22,10 @@ const Navbar = () => {
   return (
     <header className="navbar fixed top-0 left-0 right-0 z-50">
       <div className="layout-container flex items-center justify-between gap-6">
-        <Link to="/" className="text-primary font-playfair headline-md">
-          Mihur
-        </Link>
-
+      <Link to="/" className="flex items-center gap-2 text-primary font-playfair headline-md">
+  <GraduationCap className="w-7 h-7 text-primary" />
+  <span>Mihur</span>
+</Link>
         <nav className="hidden md:flex items-center gap-6">
           {NAV_LINKS.map((link) => (
             <Link

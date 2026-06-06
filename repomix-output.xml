@@ -42,9 +42,9 @@ The content is organized as follows:
 <directory_structure>
 .gitignore
 context.md
+DESIGN.md
 Documentation.md
 index.html
-metadata.json
 package.json
 README.md
 src/App.tsx
@@ -56,13 +56,16 @@ src/index.css
 src/lib/iconMap.ts
 src/lib/supabase.ts
 src/main.tsx
+src/pages/.npmrc
 src/pages/AuthPage.tsx
 src/pages/CategoriesPage.tsx
 src/pages/CategoryDetailPage.tsx
 src/pages/HomePage.tsx
 src/pages/MyLearningPage.tsx
 src/pages/Questionaire.tsx
+src/pages/RoadmapPage.tsx
 src/types.ts
+supabase/.branches/_current_branch
 tsconfig.json
 vite.config.ts
 </directory_structure>
@@ -70,11 +73,571 @@ vite.config.ts
 <files>
 This section contains the contents of the repository's files.
 
+<file path="supabase/.branches/_current_branch">
+main
+</file>
+
+<file path="DESIGN.md">
+---
+name: Ethereal Academy
+colors:
+  surface: '#111223'
+  surface-dim: '#111223'
+  surface-bright: '#37374b'
+  surface-container-lowest: '#0c0c1e'
+  surface-container-low: '#1a1a2c'
+  surface-container: '#1e1e30'
+  surface-container-high: '#28283b'
+  surface-container-highest: '#333346'
+  on-surface: '#e2e0f9'
+  on-surface-variant: '#e1bfb1'
+  inverse-surface: '#e2e0f9'
+  inverse-on-surface: '#2f2f42'
+  outline: '#a88a7d'
+  outline-variant: '#594137'
+  surface-tint: '#ffb693'
+  primary: '#ffb693'
+  on-primary: '#561f00'
+  primary-container: '#fb6d10'
+  on-primary-container: '#562000'
+  inverse-primary: '#a04100'
+  secondary: '#ffb4a4'
+  on-secondary: '#640d00'
+  secondary-container: '#ca2501'
+  on-secondary-container: '#ffe2dc'
+  tertiary: '#7bd1fa'
+  on-tertiary: '#003547'
+  tertiary-container: '#48a2c9'
+  on-tertiary-container: '#003547'
+  error: '#ffb4ab'
+  on-error: '#690005'
+  error-container: '#93000a'
+  on-error-container: '#ffdad6'
+  primary-fixed: '#ffdbcc'
+  primary-fixed-dim: '#ffb693'
+  on-primary-fixed: '#351000'
+  on-primary-fixed-variant: '#7a3000'
+  secondary-fixed: '#ffdad3'
+  secondary-fixed-dim: '#ffb4a4'
+  on-secondary-fixed: '#3e0500'
+  on-secondary-fixed-variant: '#8d1700'
+  tertiary-fixed: '#c0e8ff'
+  tertiary-fixed-dim: '#7bd1fa'
+  on-tertiary-fixed: '#001e2b'
+  on-tertiary-fixed-variant: '#004d66'
+  background: '#111223'
+  on-background: '#e2e0f9'
+  surface-variant: '#333346'
+  background-deep: '#2E2E41'
+  accent-orange: '#FB6D10'
+  accent-red: '#EB3E1B'
+  surface-light: rgba(255, 255, 255, 0.08)
+  sunset-gradient: 'linear-gradient(135deg, #FB6D10 0%, #EB3E1B 50%, #2E2E41 100%)'
+typography:
+  display-lg:
+    fontFamily: Playfair Display
+    fontSize: 48px
+    fontWeight: '700'
+    lineHeight: 56px
+    letterSpacing: -0.02em
+  headline-lg:
+    fontFamily: Playfair Display
+    fontSize: 32px
+    fontWeight: '600'
+    lineHeight: 40px
+  headline-lg-mobile:
+    fontFamily: Playfair Display
+    fontSize: 28px
+    fontWeight: '600'
+    lineHeight: 36px
+  headline-md:
+    fontFamily: Playfair Display
+    fontSize: 24px
+    fontWeight: '500'
+    lineHeight: 32px
+  body-lg:
+    fontFamily: Inter
+    fontSize: 18px
+    fontWeight: '400'
+    lineHeight: 28px
+  body-md:
+    fontFamily: Inter
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: 24px
+  label-md:
+    fontFamily: Inter
+    fontSize: 14px
+    fontWeight: '600'
+    lineHeight: 20px
+    letterSpacing: 0.05em
+  caption:
+    fontFamily: Inter
+    fontSize: 12px
+    fontWeight: '400'
+    lineHeight: 16px
+rounded:
+  sm: 0.25rem
+  DEFAULT: 0.5rem
+  md: 0.75rem
+  lg: 1rem
+  xl: 1.5rem
+  full: 9999px
+spacing:
+  container-margin: 20px
+  gutter: 16px
+  section-gap: 40px
+  overlap-offset: -24px
+---
+
+## Brand & Style
+
+This design system targets an elite educational demographic, blending the intellectual rigor of traditional academia with a contemporary, high-production artistic flair. The brand personality is **visionary, warm, and sophisticated**, moving away from "ed-tech" utility toward a "masterclass" aesthetic.
+
+The visual style is a fusion of **Glassmorphism** and **Modern-Tactile** design. It utilizes rich, spectral gradients that mimic a digital sunset—transitioning from deep charcoal into vibrant oranges and reds. This creates a sense of "enlightenment" or "the dawn of knowledge." Layouts should feel layered and dimensional, using semi-circular decorative elements and artistic overlaps to break the standard grid and evoke a more organic, artisanal feel.
+
+## Colors
+
+The palette is anchored by **Deep Navy (#2E2E41)**, providing a scholarly and premium foundation. Vibrancy is introduced through a dual-accent system of **Vibrant Orange** and **Deep Warm Red**, symbolizing energy and passion for learning.
+
+- **Primary & Secondary:** Used for high-impact actions and atmospheric gradients.
+- **Tertiary:** A soft sky blue derived from the reference material, used sparingly for "info" states or subtle highlights to cool down the warm palette.
+- **Glass Surfaces:** Dark backgrounds are overlaid with semi-transparent white or neutral layers to create depth without losing the rich color temperature.
+
+## Typography
+
+The typography system relies on a **high-contrast pairing** that balances classic elegance with modern readability. 
+
+**Playfair Display** serves as the primary voice for all headers. It should be used in large scales to showcase its sophisticated serifs. For mobile layouts, use the `headline-lg-mobile` variant to ensure long course titles remain legible.
+
+**Inter** handles all functional text. It provides a clean, neutral counterpoint to the serif headers. Use the `label-md` style with increased letter-spacing for category tags and navigation elements to maintain a premium feel.
+
+## Layout & Spacing
+
+Designed primarily for a **mobile-first context**, the layout utilizes a dynamic fluid grid. To achieve the "artistic" requirement, elements should not always align to the vertical edges.
+
+- **Artistic Overlaps:** Cards and images should occasionally use negative margins (`overlap-offset`) to stack over background "sunset" circles.
+- **Sunset Elements:** Large, semi-circular decorative divs should be positioned absolutely behind content, using the `sunset-gradient` with high-radius blurs.
+- **Safe Areas:** Maintain a strict 20px side margin for primary text content to ensure readability on edge-to-edge mobile displays.
+
+## Elevation & Depth
+
+Depth is achieved through **Tonal Layers** and **Backdrop Blurs** rather than traditional heavy shadows.
+
+- **Base Layer:** The Deep Navy (#2E2E41) background.
+- **Mid Layer:** Semi-circular "Sunset" gradients with `blur(60px)` to create soft, atmospheric light.
+- **Top Layer:** Floating cards using `backdrop-filter: blur(12px)` and a subtle 1px border of white at 10% opacity. This creates a "frosted glass" effect that picks up the warm glow from the layers beneath.
+- **Shadows:** Use very soft, long-spread shadows with an orange-tinted glow (`rgba(251, 109, 16, 0.15)`) for active primary buttons.
+
+## Shapes
+
+The shape language is **Rounded**, leaning toward softness to contrast with the sharp serifs of the typography.
+
+- **Cards & Containers:** Use `rounded-lg` (1rem) as the standard.
+- **Buttons:** Use `rounded-xl` (1.5rem) to create a friendly, tactile "squishy" appearance.
+- **Decorative Elements:** Background "Sunsets" should always be perfect circles or semi-circles.
+
+## Components
+
+### Buttons
+Primary buttons use a horizontal gradient from `accent-orange` to `accent-red`. Text is white with a slight drop shadow for legibility. Secondary buttons are "ghost" style with a glass background and a 1px orange border.
+
+### Cards
+Educational course cards should feature a large image header. The content area uses the glassmorphism style (blurred background). Title text uses `headline-md` in Playfair Display.
+
+### Chips & Tags
+Used for course categories. These should be small, pill-shaped, and use a low-opacity version of the `accent-orange` background with high-contrast white `label-md` text.
+
+### Input Fields
+Darker than the background, with a subtle inner shadow. On focus, the border glows with the `accent-orange` color.
+
+### Progress Indicators
+For education tracking, use a thick, rounded bar. The "filled" portion uses the `sunset-gradient` to indicate progress toward "enlightenment."
+</file>
+
+<file path="src/lib/iconMap.ts">
+// src/lib/iconMap.ts
+import { 
+  Terminal, 
+  Briefcase, 
+  FlaskConical, 
+  Palette, 
+  Languages, 
+  Theater, 
+  Megaphone, 
+  Heart, 
+  User, 
+  Calculator, 
+  Music, 
+  Camera, 
+  HelpCircle,
+  Code,
+  Activity,
+  Globe,
+  TrendingUp,
+  Type
+} from 'lucide-react';
+
+const icons: Record<string, React.ComponentType<any>> = {
+  terminal: Terminal,
+  tech: Code,
+  business: Briefcase,
+  science: FlaskConical,
+  design: Palette,
+  languages: Languages,
+  marketing: TrendingUp,
+  health: Activity,
+  math: Calculator,
+  arts: Type,
+  default: HelpCircle
+};
+
+export const getIconComponent = (iconName: string | null | undefined) => {
+  if (!iconName) return HelpCircle;
+  return icons[iconName.toLowerCase()] || HelpCircle;
+};
+
+export default getIconComponent;
+</file>
+
+<file path="src/pages/.npmrc">
+engine-strict=false
+legacy-peer-deps=true
+</file>
+
+<file path="src/pages/RoadmapPage.tsx">
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle, Circle, Loader2, Plus, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+
+interface Roadmap {
+  id: string;
+  title: string;
+  description: string;
+  progress_percent: number;
+  total_steps: number;
+  completed_steps: number;
+}
+
+interface Step {
+  id: string;
+  title: string;
+  description: string;
+  step_order: number;
+  is_completed: boolean;
+  estimated_hours: number;
+  course_id: string | null;
+}
+
+const RoadmapPage = () => {
+  const { user } = useAuth();
+  const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
+  const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null);
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchRoadmaps();
+  }, [user]);
+
+  const fetchRoadmaps = async () => {
+    const { data } = await supabase
+      .from('user_roadmaps')
+      .select('*')
+      .eq('user_id', user!.id)
+      .order('created_at', { ascending: false });
+    
+    if (data) {
+      setRoadmaps(data);
+      if (data.length > 0 && !selectedRoadmap) {
+        setSelectedRoadmap(data[0]);
+        fetchSteps(data[0].id);
+      }
+    }
+    setLoading(false);
+  };
+
+  const fetchSteps = async (roadmapId: string) => {
+    const { data } = await supabase
+      .from('roadmap_steps')
+      .select('*')
+      .eq('roadmap_id', roadmapId)
+      .order('step_order', { ascending: true });
+    
+    if (data) setSteps(data);
+  };
+
+  const toggleStep = async (step: Step) => {
+    const newCompleted = !step.is_completed;
+    
+    // Optimistic update
+    setSteps(prev => prev.map(s => 
+      s.id === step.id ? { ...s, is_completed: newCompleted } : s
+    ));
+
+    // Update database
+    const { error } = await supabase
+      .from('roadmap_steps')
+      .update({ 
+        is_completed: newCompleted,
+        completed_at: newCompleted ? new Date().toISOString() : null
+      })
+      .eq('id', step.id);
+
+    if (!error && selectedRoadmap) {
+      // Recalculate progress
+      const updatedSteps = steps.map(s => 
+        s.id === step.id ? { ...s, is_completed: newCompleted } : s
+      );
+      const completedCount = updatedSteps.filter(s => s.is_completed).length;
+      const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
+      
+      await supabase
+        .from('user_roadmaps')
+        .update({ 
+          completed_steps: completedCount,
+          progress_percent: progressPercent
+        })
+        .eq('id', selectedRoadmap.id);
+      
+      // Update local roadmap
+      setSelectedRoadmap({
+        ...selectedRoadmap,
+        completed_steps: completedCount,
+        progress_percent: progressPercent
+      });
+    }
+  };
+
+  const generateRoadmap = async () => {
+    setGenerating(true);
+    
+    // Fetch user profile
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', user!.id)
+      .single();
+
+    if (!profile?.category) {
+      alert('Please complete the questionnaire first');
+      setGenerating(false);
+      return;
+    }
+
+    const response = await fetch('/api/generate-roadmap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: user!.id,
+        category: profile.category,
+        skill_level: profile.skill_level,
+        goal: profile.goal,
+        weekly_hours: profile.weekly_hours
+      })
+    });
+
+    if (response.ok) {
+      fetchRoadmaps();
+    } else {
+      alert('Failed to generate roadmap. Try again later.');
+    }
+    setGenerating(false);
+  };
+
+  if (loading) return <div className="pt-32 flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+
+  if (!user) {
+    return (
+      <div className="pt-32 text-center px-4">
+        <div className="max-w-md mx-auto bg-surface-container-high rounded-3xl p-8">
+          <h2 className="text-3xl font-bold mb-4">Sign in to access your roadmap</h2>
+          <Link to="/auth" className="btn-primary">Sign In</Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-6xl mx-auto min-h-screen">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
+        <div>
+          <h1 className="headline-lg font-playfair tracking-tight mb-2">Learning Roadmaps</h1>
+          <p className="body-md text-on-surface-variant">Track your progress toward your learning goals</p>
+        </div>
+        <button 
+          onClick={generateRoadmap}
+          disabled={generating}
+          className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
+        >
+          {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+          Generate New Roadmap
+        </button>
+      </div>
+
+      {/* Roadmap Selector */}
+      {roadmaps.length > 0 && (
+        <div className="flex gap-4 mb-8 overflow-x-auto pb-4">
+          {roadmaps.map(roadmap => (
+            <button
+              key={roadmap.id}
+              onClick={() => {
+                setSelectedRoadmap(roadmap);
+                fetchSteps(roadmap.id);
+              }}
+              className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md ${
+                selectedRoadmap?.id === roadmap.id
+                  ? 'accent-gradient text-on-primary'
+                  : 'glass-card text-on-surface'
+              }`}
+            >
+              {roadmap.title}
+              <span className="ml-2 text-sm opacity-70">{roadmap.progress_percent}%</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Selected Roadmap */}
+      {selectedRoadmap && (
+        <motion.div key={selectedRoadmap.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="glass-card rounded-lg p-8 mb-8">
+            <h2 className="headline-md font-playfair mb-2">{selectedRoadmap.title}</h2>
+            <p className="text-on-surface-variant mb-6">{selectedRoadmap.description}</p>
+            
+            {/* Progress Bar using design tokens */}
+            <div className="mb-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span>Overall Progress</span>
+                <span>{selectedRoadmap.progress_percent}%</span>
+              </div>
+              <div className="progress-track">
+                <div 
+                  className="progress-fill transition-all duration-500"
+                  style={{ width: `${selectedRoadmap.progress_percent}%` }}
+                />
+              </div>
+            </div>
+            <p className="text-sm text-on-surface-variant">
+              {selectedRoadmap.completed_steps} of {selectedRoadmap.total_steps} steps completed
+            </p>
+          </div>
+
+          {/* Steps Checklist */}
+          <div className="space-y-4">
+            <h3 className="text-2xl font-bold mb-4">Learning Path</h3>
+            <AnimatePresence>
+              {steps.map((step, idx) => (
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="glass-card rounded-lg p-5 border border-outline/20 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-start gap-4">
+                    <button onClick={() => toggleStep(step)} className="mt-1 flex-shrink-0">
+                      {step.is_completed ? (
+                        <CheckCircle className="w-6 h-6 text-primary" />
+                      ) : (
+                        <Circle className="w-6 h-6 text-on-surface-variant hover:text-primary transition-colors" />
+                      )}
+                    </button>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 flex-wrap mb-1">
+                        <span className="text-sm text-on-surface-variant font-mono">Step {step.step_order}</span>
+                        <span className="text-xs text-on-surface-variant">~{step.estimated_hours} hours</span>
+                      </div>
+                      <h4 className={`headline-md font-playfair mb-1 ${step.is_completed ? 'line-through text-on-surface-variant' : ''}`}>
+                        {step.title}
+                      </h4>
+                      <p className="text-on-surface-variant text-sm">{step.description}</p>
+                      {step.course_id && (
+                        <Link 
+                          to={`/category/${step.course_id}`}
+                          className="inline-flex items-center gap-1 text-primary text-sm mt-3 hover:underline"
+                        >
+                          View Recommended Course <TrendingUp className="w-3 h-3" />
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
+
+      {roadmaps.length === 0 && !generating && (
+        <div className="text-center py-20 bg-surface-container-high rounded-3xl">
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <TrendingUp className="w-10 h-10 text-primary" />
+          </div>
+          <h3 className="text-2xl font-bold mb-2">No roadmaps yet</h3>
+          <p className="text-on-surface-variant mb-8 max-w-md mx-auto">
+            Complete the questionnaire to get a personalized learning roadmap.
+          </p>
+          <Link to="/questionaire" className="btn-primary">
+            Complete Questionnaire
+          </Link>
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
+export default RoadmapPage;
+</file>
+
+<file path="vite.config.ts">
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import {defineConfig, loadEnv} from 'vite';
+
+export default defineConfig(({mode}) => {
+  const env = loadEnv(mode, '.', '');
+  return {
+    plugins: [react(), tailwindcss()],
+    define: {
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, '.'),
+      },
+    },
+    server: {
+      // HMR is disabled in AI Studio via DISABLE_HMR env var.
+      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+      hmr: process.env.DISABLE_HMR !== 'true',
+    },
+  };
+});
+</file>
+
+<file path=".gitignore">
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.local
+</file>
+
 <file path="context.md">
-# Project Context: EduFinder (Full Specification)
+# Project Context: Mihur (Full Specification)
 
 ## 1. Project Overview
-[cite_start]**EduFinder** is a web-based platform designed to centralize and personalize the discovery of free online courses[cite: 2, 30]. [cite_start]It targets high school and early college learners, helping them navigate information overload by providing structured learning paths[cite: 39, 52].
+[cite_start]**Mihur** is a web-based platform designed to centralize and personalize the discovery of free online courses[cite: 2, 30]. [cite_start]It targets high school and early college learners, helping them navigate information overload by providing structured learning paths[cite: 39, 52].
 
 ## 2. Core Features
 * [cite_start]**Questionnaire-Based Recommendations:** A user-friendly questionnaire to identify interests, skill levels, and goals[cite: 55, 98].
@@ -108,11 +671,11 @@ This section contains the contents of the repository's files.
 </file>
 
 <file path="Documentation.md">
-# EduFinder – Documentation
+# Mihur – Documentation
 
 ## 1. Overview
 
-**EduFinder** is a web-based platform that helps learners discover and save free online courses from multiple providers (Coursera, edX, Khan Academy, FutureLearn). It offers a questionnaire‑based personalization, category browsing, and a “My Learning” area where users can bookmark courses for later.
+**Mihur** is a web-based platform that helps learners discover and save free online courses from multiple providers (Coursera, edX, Khan Academy, FutureLearn). It offers a questionnaire‑based personalization, category browsing, and a “My Learning” area where users can bookmark courses for later.
 
 The application is built with **React (TypeScript)** and **Supabase** as the backend (authentication + database). No internal course hosting – users are redirected to the original provider.
 
@@ -145,7 +708,7 @@ The application is built with **React (TypeScript)** and **Supabase** as the bac
 ## 4. Project Structure
 
 ```
-EduFinder/
+Mihur/
 ├── .env.local                 # Supabase keys (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
 ├── .gitignore
 ├── package.json
@@ -258,7 +821,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 1. **Clone the repository**
    ```bash
    git clone <repo-url>
-   cd EduFinder
+  cd Mihur
    ```
 
 2. **Install dependencies**
@@ -427,226 +990,6 @@ The project is ready to be deployed on **Netlify**, **Vercel**, or any static ho
 This project is for educational/demo purposes. All external course links and provider trademarks are property of their respective owners.
 </file>
 
-<file path="metadata.json">
-{
-  "name": "EduFinder",
-  "description": "Discover thousands of free courses from Coursera, edX, Khan Academy, and FutureLearn in one place.",
-  "requestFramePermissions": []
-}
-</file>
-
-<file path="src/lib/iconMap.ts">
-// src/lib/iconMap.ts
-import { 
-  Terminal, 
-  Briefcase, 
-  FlaskConical, 
-  Palette, 
-  Languages, 
-  Theater, 
-  Megaphone, 
-  Heart, 
-  User, 
-  Calculator, 
-  Music, 
-  Camera, 
-  HelpCircle,
-  Code,
-  Activity,
-  Globe,
-  TrendingUp,
-  Type
-} from 'lucide-react';
-
-const icons: Record<string, React.ComponentType<any>> = {
-  terminal: Terminal,
-  tech: Code,
-  business: Briefcase,
-  science: FlaskConical,
-  design: Palette,
-  languages: Languages,
-  marketing: TrendingUp,
-  health: Activity,
-  math: Calculator,
-  arts: Type,
-  default: HelpCircle
-};
-
-export const getIconComponent = (iconName: string | null | undefined) => {
-  if (!iconName) return HelpCircle;
-  return icons[iconName.toLowerCase()] || HelpCircle;
-};
-
-export default getIconComponent;
-</file>
-
-<file path="src/pages/MyLearningPage.tsx">
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Loader2, Bookmark, Lock } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
-import { Course } from '../types';
-import CourseCard from '../components/CourseCard';
-
-const MyLearningPage = () => {
-  const { user } = useAuth();
-  const [savedCourses, setSavedCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-
-    const fetchSavedCourses = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      // Pro-trick: We query the 'saved_courses' table, but ask Supabase to 
-      // automatically bring along the actual course data from the 'courses' table!
-      const { data, error } = await supabase
-        .from('saved_courses')
-        .select(`
-          course_id,
-          courses (*)
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Saved courses fetch failed', error);
-        setError(error.message);
-      }
-      if (data) {
-        // Extract just the course objects from the joined data
-        const courses = data.map((row: any) => row.courses);
-        setSavedCourses(courses);
-      }
-      
-      setLoading(false);
-    };
-
-    fetchSavedCourses();
-  }, [user]);
-
-  if (loading) return <div className="pt-48 min-h-screen flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
-
-  if (error) {
-    return (
-      <div className="pt-48 flex justify-center px-8 text-center min-h-screen">
-        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-10 text-red-200">
-          <h2 className="text-2xl font-bold mb-3">Unable to load saved courses</h2>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Protect the route!
-  if (!user) {
-    return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-48 pb-32 px-8 max-w-2xl mx-auto text-center min-h-screen">
-        <div className="bg-surface-container-high rounded-3xl p-12 shadow-xl border border-outline-variant/20">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-8 h-8 text-primary" />
-          </div>
-          <h2 className="text-3xl font-bold mb-4 text-on-surface">Sign in to view saved courses</h2>
-          <Link to="/auth" className="px-8 py-4 rounded-xl primary-gradient text-on-primary font-bold active:scale-95 transition-all inline-block mt-4">
-            Sign In / Sign Up
-          </Link>
-        </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-48 pb-32 px-8 max-w-7xl mx-auto min-h-screen">
-      <div className="mb-16">
-        <h1 className="text-5xl font-bold tracking-tight mb-4">My Learning</h1>
-        <p className="text-xl text-on-surface-variant max-w-2xl">
-          Your personal library of saved courses and learning paths.
-        </p>
-      </div>
-
-      {savedCourses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {savedCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
-      ) : (
-        <div className="bg-surface-container-high rounded-3xl p-20 text-center border border-outline/10 mt-8">
-          <Bookmark className="w-12 h-12 text-primary/40 mx-auto mb-6" />
-          <h3 className="text-2xl font-bold mb-2">No saved courses yet</h3>
-          <p className="text-on-surface-variant mb-8">Start exploring and click the heart icon on any course to save it here.</p>
-          <Link to="/categories" className="px-8 py-3 rounded-xl primary-gradient text-on-primary font-bold inline-block">
-            Explore Courses
-          </Link>
-        </div>
-      )}
-    </motion.div>
-  );
-};
-
-export default MyLearningPage;
-</file>
-
-<file path="vite.config.ts">
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import {defineConfig, loadEnv} from 'vite';
-
-export default defineConfig(({mode}) => {
-  const env = loadEnv(mode, '.', '');
-  return {
-    plugins: [react(), tailwindcss()],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-    },
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-      },
-    },
-    server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
-      hmr: process.env.DISABLE_HMR !== 'true',
-    },
-  };
-});
-</file>
-
-<file path=".gitignore">
-node_modules/
-build/
-dist/
-coverage/
-.DS_Store
-*.log
-.env*
-!.env.local
-</file>
-
-<file path="index.html">
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edu-finder</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-</file>
-
 <file path="README.md">
 
 </file>
@@ -711,6 +1054,120 @@ export const useAuth = () => {
 };
 </file>
 
+<file path="src/pages/MyLearningPage.tsx">
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Loader2, Bookmark, Lock } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { Course } from '../types';
+import CourseCard from '../components/CourseCard';
+
+const MyLearningPage = () => {
+  const { user } = useAuth();
+  const [savedCourses, setSavedCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const fetchSavedCourses = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      // Pro-trick: We query the 'saved_courses' table, but ask Supabase to 
+      // automatically bring along the actual course data from the 'courses' table!
+      const { data, error } = await supabase
+        .from('saved_courses')
+        .select(`
+          course_id,
+          courses (*)
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Saved courses fetch failed', error);
+        setError(error.message);
+      }
+      if (data) {
+        // Extract just the course objects from the joined data
+        const courses = data.map((row: any) => row.courses);
+        setSavedCourses(courses);
+      }
+      
+      setLoading(false);
+    };
+
+    fetchSavedCourses();
+  }, [user]);
+
+  if (loading) return <div className="pt-32 min-h-screen flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+
+  if (error) {
+    return (
+      <div className="pt-32 flex justify-center px-4 text-center min-h-screen w-full">
+        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-8 text-red-200">
+          <h2 className="text-2xl font-bold mb-3">Unable to load saved courses</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Protect the route!
+  if (!user) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-2xl mx-auto text-center min-h-screen">
+        <div className="glass-card rounded-lg p-12 shadow-xl border border-outline-variant/20">
+          <div className="w-16 h-16 bg-primary-container/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8 text-on-primary" />
+          </div>
+          <h2 className="headline-md font-playfair mb-4 text-on-surface">Sign in to view saved courses</h2>
+          <Link to="/auth" className="btn-primary inline-block mt-4">
+            Sign In / Sign Up
+          </Link>
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-7xl mx-auto min-h-screen">
+      <div className="mb-16">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">My Learning</h1>
+        <p className="text-xl text-on-surface-variant max-w-2xl">
+          Your personal library of saved courses and learning paths.
+        </p>
+      </div>
+
+      {savedCourses.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {savedCourses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-surface-container-high rounded-3xl p-20 text-center border border-outline/10 mt-8">
+          <Bookmark className="w-12 h-12 text-primary/40 mx-auto mb-6" />
+          <h3 className="text-2xl font-bold mb-2">No saved courses yet</h3>
+          <p className="text-on-surface-variant mb-8">Start exploring and click the heart icon on any course to save it here.</p>
+          <Link to="/categories" className="px-8 py-3 rounded-xl primary-gradient text-on-primary font-bold inline-block">
+            Explore Courses
+          </Link>
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
+export default MyLearningPage;
+</file>
+
 <file path="src/types.ts">
 // src/types.ts
 export interface Course {
@@ -763,45 +1220,22 @@ export interface Category {
 }
 </file>
 
-<file path="package.json">
-{
-  "name": "react-example",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview",
-    "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@google/genai": "^1.29.0",
-    "@supabase/supabase-js": "^2.103.0",
-    "@tailwindcss/vite": "^4.1.14",
-    "@vitejs/plugin-react": "^5.0.4",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
-    "lucide-react": "^0.546.0",
-    "motion": "^12.23.24",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.13.2",
-    "vite": "^6.2.0"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^22.14.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "autoprefixer": "^10.4.21",
-    "tailwindcss": "^4.1.14",
-    "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
-  }
-}
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mihur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@500;600;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
 </file>
 
 <file path="src/components/CategoryCard.tsx">
@@ -818,14 +1252,14 @@ const CategoryCard = ({ category }: { category: Category }) => {
   return (
     <Link to={`/category/${category.id}`}>
       <motion.div
-        whileHover={{ scale: 1.05, backgroundColor: 'var(--color-surface-bright)' }}
-        className="bg-surface-container-highest p-8 rounded-2xl ghost-border cursor-pointer text-center group transition-colors h-full"
+        whileHover={{ scale: 1.03 }}
+        className="glass-card p-6 rounded-lg cursor-pointer text-center group transition-all h-full flex flex-col items-center"
       >
-        <div className="w-12 h-12 bg-primary-container/20 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-          <Icon className="w-6 h-6 text-primary" />
+        <div className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 accent-gradient group-hover:scale-105 transition-transform">
+          <Icon className="w-6 h-6 text-on-primary" />
         </div>
-        <span className="font-medium text-on-surface block mb-2">{category.name}</span>
-        <p className="text-xs text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity line-clamp-2">
+        <span className="label-md text-on-surface block mb-2">{category.name}</span>
+        <p className="caption text-on-surface-variant opacity-80 text-center line-clamp-2">
           {category.description}
         </p>
       </motion.div>
@@ -834,6 +1268,22 @@ const CategoryCard = ({ category }: { category: Category }) => {
 };
 
 export default CategoryCard;
+</file>
+
+<file path="src/main.tsx">
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import { AuthProvider } from './contexts/AuthContext.tsx';
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </StrictMode>,
+);
 </file>
 
 <file path="src/pages/CategoriesPage.tsx">
@@ -867,13 +1317,13 @@ const CategoriesPage = () => {
   }, []);
 
   if (loading) {
-    return <div className="pt-48 flex justify-center"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
+    return <div className="pt-32 flex justify-center"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
   }
 
   if (error) {
     return (
-      <div className="pt-48 flex justify-center px-8 text-center">
-        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-10 text-red-200">
+      <div className="pt-32 flex justify-center px-4 text-center w-full">
+        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-8 text-red-200">
           <h2 className="text-2xl font-bold mb-3">Unable to load categories</h2>
           <p>{error}</p>
         </div>
@@ -886,19 +1336,19 @@ const CategoriesPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="pt-48 pb-32 px-8 max-w-7xl mx-auto min-h-screen"
+      className="page-section max-w-7xl mx-auto min-h-screen"
     >
       <div className="mb-16">
-        <Link to="/" className="text-primary hover:underline flex items-center gap-2 mb-6 font-semibold">
+        <Link to="/" className="label-md text-on-surface-variant flex items-center gap-2 mb-6 font-semibold">
           <ArrowLeft className="w-5 h-5" /> Back to Home
         </Link>
-        <h1 className="text-6xl font-bold tracking-tight mb-4">All Categories</h1>
-        <p className="text-xl text-on-surface-variant max-w-2xl">
+        <h1 className="headline-lg font-playfair tracking-tight mb-4">All Categories</h1>
+        <p className="body-md text-on-surface-variant max-w-2xl">
           Explore our complete catalog of free educational resources across every major discipline.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {categories.map((cat) => (
           <CategoryCard key={cat.id} category={cat} />
         ))}
@@ -910,131 +1360,51 @@ const CategoriesPage = () => {
 export default CategoriesPage;
 </file>
 
-<file path="src/components/CourseCard.tsx">
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Clock, Heart } from 'lucide-react';
-import { Course } from '../types';
-import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
-
-const CourseCard = ({ course }: { course: Course }) => {
-  const { user } = useAuth();
-  const [isSaved, setIsSaved] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Check if the user has already saved this course when the card loads
-  useEffect(() => {
-    if (!user) return;
-
-    const checkSavedStatus = async () => {
-      const { data } = await supabase
-        .from('saved_courses')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('course_id', course.id)
-        .maybeSingle();
-      
-      if (data) setIsSaved(true);
-    };
-
-    checkSavedStatus();
-  }, [user, course.id]);
-
-  const toggleSave = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevents the click from triggering anything else
-    
-    if (!user) {
-      alert("Please sign in to save courses!");
-      return;
-    }
-
-    setLoading(true);
-
-    if (isSaved) {
-      // Remove from saved_courses
-      await supabase
-        .from('saved_courses')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('course_id', course.id);
-      setIsSaved(false);
-    } else {
-      // Add to saved_courses
-      await supabase
-        .from('saved_courses')
-        .insert({ user_id: user.id, course_id: course.id });
-      setIsSaved(true);
-    }
-
-    setLoading(false);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -8 }}
-      className="bg-surface-container-highest rounded-2xl overflow-hidden ghost-border group transition-all duration-300 editorial-shadow relative flex flex-col h-full"
-    >
-      <div className="aspect-video relative overflow-hidden shrink-0">
-        <img
-          src={course.image}
-          alt={course.title}
-          referrerPolicy="no-referrer"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[0.6875rem] uppercase tracking-wider font-bold shadow-md">
-            {course.level}
-          </span>
-        </div>
-        
-        {/* THE NEW HEART BUTTON */}
-        <button 
-          onClick={toggleSave}
-          disabled={loading}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-surface-container-lowest/50 backdrop-blur-md flex items-center justify-center hover:bg-surface-container-lowest transition-colors shadow-md disabled:opacity-50"
-        >
-          <Heart 
-            className={`w-5 h-5 transition-colors ${isSaved ? 'fill-red-500 text-red-500' : 'text-white'}`} 
-          />
-        </button>
-      </div>
-
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-primary font-bold">
-            {course.provider}
-          </span>
-          <div className="flex items-center gap-1.5 text-on-surface-variant">
-            <Clock className="w-3.5 h-3.5" />
-            <span className="text-[0.6875rem]">{course.duration}</span>
-          </div>
-        </div>
-
-        <h3 className="text-xl font-bold mb-3 leading-tight text-on-surface group-hover:text-primary transition-colors">
-          {course.title}
-        </h3>
-        <p className="text-sm text-on-surface-variant mb-6 line-clamp-2 leading-relaxed flex-grow">
-          {course.description}
-        </p>
-
-        <a
-          href={course.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full py-3 rounded-xl bg-surface-container-high border border-outline/20 text-primary font-bold hover:bg-primary hover:text-on-primary transition-all duration-200 block text-center mt-auto"
-        >
-          View Course
-        </a>
-      </div>
-    </motion.div>
-  );
-};
-
-export default CourseCard;
+<file path="package.json">
+{
+  "name": "mihur",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^1.29.0",
+    "@supabase/supabase-js": "^2.103.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "@vitejs/plugin-react": "^5.0.4",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.13.2",
+    "vite": "^6.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.21",
+    "supabase": "^2.102.0",
+    "tailwindcss": "^4.1.14",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  },
+  
+  "engines": {
+  "node": "20.x",
+  "npm": "10.x"
+}
+}
 </file>
 
 <file path="src/components/Navbar.tsx">
@@ -1061,8 +1431,8 @@ const Navbar = () => {
   return (
     <header className="navbar fixed top-0 left-0 right-0 z-50">
       <div className="layout-container flex items-center justify-between gap-6">
-        <Link to="/" className="text-primary font-semibold text-lg">
-          EduFinder
+        <Link to="/" className="text-primary font-playfair headline-md">
+          Mihur
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -1106,20 +1476,225 @@ const Navbar = () => {
 export default Navbar;
 </file>
 
-<file path="src/main.tsx">
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import { AuthProvider } from './contexts/AuthContext.tsx';
-import './index.css';
+<file path="src/App.tsx">
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </StrictMode>,
-);
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
+import CategoriesPage from './pages/CategoriesPage';
+import CategoryDetailPage from './pages/CategoryDetailPage';
+import QuestionnairePage from './pages/Questionaire';
+import AuthPage from './pages/AuthPage';
+import MyLearningPage from './pages/MyLearningPage';
+import RoadmapPage from './pages/RoadmapPage';
+
+
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen bg-surface-dim text-on-surface">
+        <Navbar />
+
+        <main className="pt-24">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/categories" element={<CategoriesPage />} />
+              <Route path="/category/:id" element={<CategoryDetailPage />} />
+              <Route path="/questionnaire" element={<QuestionnairePage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/my-learning" element={<MyLearningPage />} />
+             <Route path="/roadmap" element={<RoadmapPage />} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+
+        <footer className="bg-surface-dim border-t border-outline-variant py-20">
+          <div className="layout-container flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+              <Link to="/" className="text-xl font-semibold text-primary tracking-tight">
+                Mihur
+              </Link>
+              <p className="text-muted text-xs uppercase tracking-[0.2em] mt-2">
+                © 2026 Mihur • Built for focused learning
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-6 text-sm text-secondary">
+              <Link to="/categories" className="nav-link">
+                Categories
+              </Link>
+              <Link to="/my-learning" className="nav-link">
+                My Courses
+              </Link>
+              <Link to="/" className="nav-link">
+                About
+              </Link>
+              <Link to="/questionnaire" className='nav-link'>
+                Questionnaire
+              </Link>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </BrowserRouter>
+  );
+}
+</file>
+
+<file path="src/components/CourseCard.tsx">
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Clock, Heart } from 'lucide-react';
+import { Course } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+
+const CourseCard = ({ course }: { course: Course }) => {
+  const { user } = useAuth();
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Check if the user has already saved this course when the card loads
+  useEffect(() => {
+    if (!user) return;
+
+    const checkSavedStatus = async () => {
+      const { data } = await supabase
+        .from('saved_courses')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('course_id', course.id)
+        .limit(1)
+        .maybeSingle();
+      
+      if (data) setIsSaved(true);
+    };
+
+    checkSavedStatus();
+  }, [user, course.id]);
+
+  const toggleSave = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevents the click from triggering anything else
+    
+    if (!user) {
+      alert("Please sign in to save courses!");
+      return;
+    }
+
+    setLoading(true);
+
+    if (isSaved) {
+      // Remove from saved_courses
+      await supabase
+        .from('saved_courses')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('course_id', course.id);
+      setIsSaved(false);
+    } else {
+      // Add to saved_courses
+      await supabase
+        .from('saved_courses')
+        .insert({ user_id: user.id, course_id: course.id });
+      setIsSaved(true);
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -8 }}
+      className="glass-card overflow-hidden rounded-lg group transition-all duration-300 relative flex flex-col h-full"
+    >
+      <div className="aspect-video relative overflow-hidden shrink-0">
+        <img
+          src={course.image}
+          alt={course.title}
+          referrerPolicy="no-referrer"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        <div className="absolute top-4 left-4">
+          <span className="px-3 py-1 rounded-full chip text-on-secondary-container uppercase tracking-wider">
+            {course.level}
+          </span>
+        </div>
+        
+        {/* THE NEW HEART BUTTON */}
+        <button 
+          onClick={toggleSave}
+          disabled={loading}
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-surface-container-lowest/50 backdrop-blur-md flex items-center justify-center hover:bg-surface-container-lowest transition-colors shadow-md disabled:opacity-50"
+        >
+          <Heart 
+            className={`w-5 h-5 transition-colors ${isSaved ? 'fill-red-500 text-red-500' : 'text-white'}`} 
+          />
+        </button>
+      </div>
+
+        <div className="p-6 flex flex-col flex-grow">
+        <div className="flex items-center justify-between mb-4">
+          <span className="label-md uppercase tracking-[0.06em] text-on-surface-variant">
+            {course.provider}
+          </span>
+          <div className="flex items-center gap-1.5 text-on-surface-variant">
+            <Clock className="w-4 h-4" />
+            <span className="caption">{course.duration}</span>
+          </div>
+        </div>
+
+        <h3 className="headline-md font-playfair mb-3 leading-tight text-on-surface transition-colors">
+          {course.title}
+        </h3>
+        <p className="body-md text-on-surface-variant mb-6 line-clamp-2 leading-relaxed flex-grow">
+          {course.description}
+        </p>
+
+        <a
+          href={course.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-primary block text-center mt-auto"
+        >
+          View Course
+        </a>
+      </div>
+    </motion.div>
+  );
+};
+
+export default CourseCard;
+</file>
+
+<file path="src/lib/supabase.ts">
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: localStorage,
+  },
+});
+
+// Log auth events for debugging (remove later)
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log('🔐 Supabase Auth Event:', event, session?.user?.email);
+});
 </file>
 
 <file path="src/pages/CategoryDetailPage.tsx">
@@ -1151,6 +1726,7 @@ const CategoryDetailPage = () => {
         .from('categories')
         .select('*')
         .eq('id', id)
+        .limit(1)
         .maybeSingle();
       
       if (catError) {
@@ -1179,7 +1755,7 @@ const CategoryDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="pt-48 flex justify-center min-h-screen">
+      <div className="pt-32 flex justify-center min-h-screen">
         <Loader2 className="animate-spin w-10 h-10 text-primary" />
       </div>
     );
@@ -1187,8 +1763,8 @@ const CategoryDetailPage = () => {
 
   if (error) {
     return (
-      <div className="pt-48 flex justify-center px-8 text-center min-h-screen">
-        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-10 text-red-200">
+      <div className="pt-32 flex justify-center px-4 text-center min-h-screen w-full">
+        <div className="max-w-xl rounded-3xl border border-red-500/20 bg-[#2a1c1c] p-8 text-red-200">
           <h2 className="text-2xl font-bold mb-3">Unable to load this category</h2>
           <p>{error}</p>
         </div>
@@ -1198,8 +1774,8 @@ const CategoryDetailPage = () => {
 
   if (!category) {
     return (
-      <div className="pt-48 pb-32 px-8 text-center min-h-screen">
-        <h1 className="text-4xl font-bold mb-4">Category not found</h1>
+      <div className="page-section text-center min-h-screen">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">Category not found</h1>
         <Link to="/categories" className="text-primary hover:underline">View all categories</Link>
       </div>
     );
@@ -1212,20 +1788,20 @@ const CategoryDetailPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="pt-48 pb-32 px-8 max-w-7xl mx-auto min-h-screen"
+      className="page-section max-w-7xl mx-auto min-h-screen"
     >
       <div className="mb-16">
-        <Link to="/categories" className="text-primary hover:underline flex items-center gap-2 mb-6 font-semibold">
+        <Link to="/categories" className="label-md text-on-surface-variant flex items-center gap-2 mb-6 font-semibold">
           <ArrowLeft className="w-5 h-5" />
           All Categories
         </Link>
-        <div className="flex items-center gap-6 mb-6">
-          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-            <Icon className="w-8 h-8 text-primary" />
+        <div className="flex flex-col sm:flex-row items-center gap-6 mb-6 text-left sm:text-left">
+          <div className="w-16 h-16 rounded-lg accent-gradient flex items-center justify-center shrink-0">
+            <Icon className="w-8 h-8 text-on-primary" />
           </div>
           <div>
-            <h1 className="text-6xl font-bold tracking-tight mb-2">{category.name}</h1>
-            <p className="text-xl text-on-surface-variant max-w-2xl">
+            <h1 className="headline-lg font-playfair mb-2">{category.name}</h1>
+            <p className="body-md text-on-surface-variant max-w-2xl">
               {category.description}
             </p>
           </div>
@@ -1276,8 +1852,27 @@ const HomePage = () => {
   
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+  
 
   useEffect(() => {
+    // Add this at the top of HomePage component
+const testSupabase = async () => {
+  console.log('Testing Supabase connection...');
+  const { data: cats, error: catErr } = await supabase.from('categories').select('id').limit(1);
+  console.log('Categories test:', catErr ? 'ERROR' : 'OK', catErr?.message);
+  
+  const { data: coursesTest, error: courseErr } = await supabase.from('courses').select('id').limit(1);
+  console.log('Courses test:', courseErr ? 'ERROR' : 'OK', courseErr?.message);
+  
+  const { data: profilesTest, error: profErr } = await supabase.from('user_profiles').select('user_id').limit(1);
+  console.log('User_profiles test:', profErr ? 'ERROR' : 'OK', profErr?.message);
+  
+  const { data: savedTest, error: savedErr } = await supabase.from('saved_courses').select('id').limit(1);
+  console.log('Saved_courses test:', savedErr ? 'ERROR' : 'OK', savedErr?.message);
+};
+
+// Call it inside useEffect, after fetchData or before
+testSupabase();
     const fetchData = async () => {
       // 1. Fetch Categories and Courses
       const [catResponse, courseResponse] = await Promise.all([
@@ -1302,11 +1897,12 @@ const HomePage = () => {
           .from('user_profiles')
           .select('category, skill_level')
           .eq('user_id', user.id)
+          .limit(1)
           .maybeSingle();
 
         if (profileError) {
           console.error('Profile fetch failed', profileError);
-          setError(profileError.message);
+          // User profile lookup should not stop the main course listing from rendering.
         }
 
         if (profile && profile.category) {
@@ -1355,11 +1951,15 @@ const HomePage = () => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       {/* Hero Section */}
-      <section className="pt-48 pb-32 px-8 max-w-7xl mx-auto text-center">
+      <section className="page-section max-w-7xl mx-auto text-center relative">
+        <div className="hero-decor">
+          <div className="sunset-circle" />
+          <div className="sunset-blob" />
+        </div>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-8xl font-bold tracking-tight mb-8 max-w-5xl mx-auto leading-[0.95]"
+          className="display-lg font-playfair tracking-tight mb-8 max-w-4xl mx-auto leading-[0.95] text-on-surface"
         >
           Find the Best Free Courses, Fast
         </motion.h1>
@@ -1367,7 +1967,7 @@ const HomePage = () => {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-lg md:text-2xl text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed"
+          className="body-lg text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed"
         >
           Discover thousands of free courses from Coursera, edX, Khan Academy, and FutureLearn in one place.
         </motion.p>
@@ -1393,7 +1993,7 @@ const HomePage = () => {
 
       {/* Recommended Section (PHASE 6) - ONLY shows if logged in AND has profile */}
       {user && recommendedCourses.length > 0 && !searchQuery && (
-        <section className="py-16 max-w-7xl mx-auto px-8">
+        <section className="page-section max-w-7xl mx-auto">
           <div className="mb-12 flex items-center justify-between bg-primary/10 p-8 rounded-3xl border border-primary/20">
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -1416,9 +2016,9 @@ const HomePage = () => {
 
       {/* Categories Section - Hides when searching */}
       {!searchQuery && (
-        <section className="bg-surface-container-low py-32">
-          <div className="max-w-7xl mx-auto px-8">
-            <div className="flex items-end justify-between mb-16">
+        <section className="bg-surface-container-low page-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-16 gap-4">
               <div>
                 <h2 className="text-4xl font-bold tracking-tight">Explore by Category</h2>
               </div>
@@ -1427,7 +2027,7 @@ const HomePage = () => {
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
               {categories.map((cat) => <CategoryCard key={cat.id} category={cat} />)}
             </div>
           </div>
@@ -1435,9 +2035,9 @@ const HomePage = () => {
       )}
 
       {/* Courses Section (Updates based on search!) */}
-      <section className="py-32 max-w-7xl mx-auto px-8">
-        <div className="mb-16">
-          <h2 className="text-5xl font-bold tracking-tight">
+      <section className="page-section max-w-7xl mx-auto">
+        <div className="mb-10">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
             {searchQuery ? `Search Results for "${searchQuery}"` : "Popular Free Courses"}
           </h2>
         </div>
@@ -1508,7 +2108,12 @@ const QuestionnairePage = () => {
         .from('user_profiles')
         .select('*')
         .eq('user_id', user.id)
+        .limit(1)
         .maybeSingle();
+
+      if (error) {
+        console.error('User profile fetch failed', error);
+      }
 
       if (data) {
         // Map database snake_case back to our frontend camelCase
@@ -1563,13 +2168,13 @@ const QuestionnairePage = () => {
   };
 
   if (loading) {
-    return <div className="pt-48 min-h-screen flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+    return <div className="pt-32 min-h-screen flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
   }
 
   // Protect the route: Don't let them fill it out if they aren't logged in
   if (!user) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-48 pb-32 px-8 max-w-2xl mx-auto text-center min-h-screen">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-2xl mx-auto text-center min-h-screen">
         <div className="bg-surface-container-high rounded-3xl p-12 shadow-xl border border-outline-variant/20">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8 text-primary" />
@@ -1591,26 +2196,26 @@ const QuestionnairePage = () => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className="pt-48 pb-32 px-8 max-w-4xl mx-auto"
+      className="page-section max-w-4xl mx-auto"
     >
       <div className="mb-12">
-        <Link to="/" className="text-primary hover:underline flex items-center gap-2 font-semibold">
+        <Link to="/" className="label-md text-on-surface-variant flex items-center gap-2 font-semibold">
           ← Back to Home
         </Link>
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight mt-6 mb-2">Learning Questionnaire</h1>
-        <p className="text-on-surface-variant text-lg max-w-2xl">
+        <h1 className="headline-lg font-playfair mt-6 mb-2">Learning Questionnaire</h1>
+        <p className="body-md text-on-surface-variant max-w-2xl">
           Answer a few quick questions and we’ll personalize your course recommendations right away.
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="bg-surface-container-high rounded-3xl p-8 shadow-md border border-outline-variant/20 space-y-6">
+      <form onSubmit={onSubmit} className="glass-card rounded-lg p-8 shadow-md border border-outline-variant/20 space-y-6">
         <div>
           <label className="block text-sm font-bold mb-2" htmlFor="category">Top area of interest</label>
           <select
             id="category"
             value={answers.category}
             onChange={(e) => setAnswers((prev) => ({ ...prev, category: e.target.value }))}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
             <option value="">Select a category</option>
@@ -1632,7 +2237,7 @@ const QuestionnairePage = () => {
             id="skillLevel"
             value={answers.skillLevel}
             onChange={(e) => setAnswers((prev) => ({ ...prev, skillLevel: e.target.value as SurveyAnswers['skillLevel'] }))}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
             <option value="">Select level</option>
@@ -1651,7 +2256,7 @@ const QuestionnairePage = () => {
             onChange={(e) => setAnswers((prev) => ({ ...prev, weeklyHours: Number(e.target.value) }))}
             min={1}
             max={40}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           />
         </div>
@@ -1662,7 +2267,7 @@ const QuestionnairePage = () => {
             id="reason"
             value={answers.reason}
             onChange={(e) => setAnswers((prev) => ({ ...prev, reason: e.target.value as SurveyAnswers['reason'] }))}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
             <option value="">Select reason</option>
@@ -1696,7 +2301,7 @@ const QuestionnairePage = () => {
             value={answers.goal}
             onChange={(e) => setAnswers((prev) => ({ ...prev, goal: e.target.value }))}
             rows={4}
-            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             placeholder="e.g. build a portfolio project, land a job, improve data analytics"
             required
           />
@@ -1706,7 +2311,7 @@ const QuestionnairePage = () => {
           <button 
             type="submit" 
             disabled={saving}
-            className="w-full md:w-auto px-8 py-3 rounded-xl primary-gradient text-on-primary font-bold transition-all hover:opacity-95 disabled:opacity-70 flex items-center justify-center min-w-[160px]"
+            className="w-full md:w-auto px-8 py-3 rounded-xl btn-primary transition-all disabled:opacity-70 flex items-center justify-center min-w-[160px]"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save Answers'}
           </button>
@@ -1714,7 +2319,7 @@ const QuestionnairePage = () => {
           <button 
             type="button" 
             onClick={reset} 
-            className="w-full md:w-auto px-8 py-3 rounded-xl bg-surface-container-highest border border-outline/20 text-on-surface font-medium hover:bg-surface-bright transition-all"
+            className="w-full md:w-auto px-8 py-3 rounded-xl btn-secondary"
           >
             Clear Form
           </button>
@@ -1737,108 +2342,40 @@ const QuestionnairePage = () => {
 export default QuestionnairePage;
 </file>
 
-<file path="src/App.tsx">
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import CategoriesPage from './pages/CategoriesPage';
-import CategoryDetailPage from './pages/CategoryDetailPage';
-import QuestionnairePage from './pages/Questionaire';
-import AuthPage from './pages/AuthPage';
-import MyLearningPage from './pages/MyLearningPage';
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-main text-primary">
-        <Navbar />
-
-        <main className="pt-24">
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/categories" element={<CategoriesPage />} />
-              <Route path="/category/:id" element={<CategoryDetailPage />} />
-              <Route path="/questionnaire" element={<QuestionnairePage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/my-learning" element={<MyLearningPage />} />
-            </Routes>
-          </AnimatePresence>
-        </main>
-
-        <footer className="bg-main border-t border-border-subtle py-20">
-          <div className="layout-container flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <Link to="/" className="text-xl font-semibold text-primary tracking-tight">
-                EduFinder
-              </Link>
-              <p className="text-muted text-xs uppercase tracking-[0.2em] mt-2">
-                © 2026 EduFinder • Built for focused learning
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-6 text-sm text-secondary">
-              <Link to="/categories" className="nav-link">
-                Categories
-              </Link>
-              <Link to="/my-learning" className="nav-link">
-                My Courses
-              </Link>
-              <Link to="/" className="nav-link">
-                About
-              </Link>
-              <Link to="/questionnaire" className='nav-link'>
-                Questionnaire
-              </Link>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </BrowserRouter>
-  );
-}
-</file>
-
 <file path="src/index.css">
 @import "tailwindcss";
 
 @theme {
-  --color-surface-dim: #060e20;
-  --color-surface-bright: #1f2b49;
-  --color-surface-container-lowest: #000000;
-  --color-surface-container-low: #091328;
-  --color-surface-container: #0f1930;
-  --color-surface-container-high: #141f38;
-  --color-surface-container-highest: #192540;
+  --color-surface-dim: #2E2E41; /* Dark background requested */
+  --color-surface-bright: #363646;
+  --color-surface-container-lowest: #222230;
+  --color-surface-container-low: #262634;
+  --color-surface-container: #2b2b3f;
+  --color-surface-container-high: #333348;
+  --color-surface-container-highest: #3b3b56;
   
-  --color-on-surface: #dee5ff;
-  --color-on-surface-variant: #a3aac4;
+  --color-on-surface: #F6F5F4; /* light text */
+  --color-on-surface-variant: #cfc9c6;
   
-  --color-primary: #85adff;
-  --color-primary-dim: #699cff;
-  --color-primary-container: #6e9fff;
-  --color-on-primary: #002c66;
+  --color-primary: #FB6D10; /* main warm accent */
+  --color-primary-dim: #d55a0d;
+  --color-primary-container: #ff8b3a;
+  --color-on-primary: #ffffff;
   
-  --color-secondary: #8097ff;
-  --color-secondary-container: #213da1;
-  --color-on-secondary-container: #c5ceff;
+  --color-secondary: #EB3E1B; /* secondary warm accent */
+  --color-secondary-container: #ff6a3a;
+  --color-on-secondary-container: #ffffff;
   
-  --color-tertiary: #fbabff;
-  --color-outline: #6d758c;
-  --color-outline-variant: #40485d;
+  --color-tertiary: #ffb37a;
+  --color-outline: rgba(255,255,255,0.06);
+  --color-outline-variant: rgba(255,255,255,0.04);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer utilities {
   .glass-nav {
-    background: rgba(6, 14, 32, 0.6);
+    background: linear-gradient(180deg, rgba(46,46,65,0.55), rgba(46,46,65,0.35));
     backdrop-filter: blur(24px);
   }
   
@@ -1851,12 +2388,24 @@ export default function App() {
   }
   
   .primary-gradient {
-    background: linear-gradient(135deg, #85adff 0%, #6e9fff 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  }
+
+  .accent-gradient {
+    background: linear-gradient(120deg, rgba(251,109,16,0.95) 0%, rgba(235,62,27,0.9) 45%, rgba(255,179,122,0.85) 100%);
+  }
+
+  .warm-gradient-3 {
+    background: radial-gradient(circle at 10% 10%, rgba(251,109,16,0.18), transparent 15%), radial-gradient(circle at 90% 80%, rgba(235,62,27,0.12), transparent 25%), var(--color-surface-dim);
   }
 }
 
 body {
-  @apply bg-surface-dim text-on-surface font-sans antialiased selection:bg-primary-container selection:text-on-primary;
+  @apply bg-surface-dim text-on-surface font-sans antialiased;
+  selection: {
+    background: var(--color-primary-container);
+    color: var(--color-on-primary);
+  }
 }
 
 /* ========== BUTTON STYLES ========== */
@@ -1865,24 +2414,25 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: var(--color-primary);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   color: var(--color-on-primary);
-  font-weight: 600;
+  font-weight: 700;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
-  transition: all 0.2s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
   cursor: pointer;
   border: none;
-  font-size: 0.875rem;
+  font-size: 0.925rem;
+  box-shadow: 0 8px 24px rgba(235,62,27,0.18);
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-dim);
-  transform: translateY(-1px);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 40px rgba(235,62,27,0.22);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -1891,26 +2441,26 @@ body {
   justify-content: center;
   gap: 0.5rem;
   background: transparent;
-  color: var(--color-on-surface);
+  color: var(--color-on-surface-variant);
   font-weight: 600;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.25rem;
   border-radius: 0.75rem;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
   cursor: pointer;
   border: 1px solid var(--color-outline);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
 }
 
 .btn-secondary:hover {
-  background: var(--color-surface-container-high);
-  border-color: var(--color-primary);
+  background: linear-gradient(90deg, rgba(251,109,16,0.06), rgba(235,62,27,0.04));
+  border-color: rgba(235,62,27,0.28);
 }
 
 /* ========== NAVBAR STYLES ========== */
 .navbar {
-  height: 70px;
-  background: rgba(6, 14, 32, 0.8);
-  backdrop-filter: blur(12px);
+  height: 72px;
+  background: linear-gradient(180deg, rgba(46,46,65,0.48), rgba(46,46,65,0.28));
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--color-outline-variant);
   position: fixed;
   top: 0;
@@ -1922,57 +2472,57 @@ body {
 .nav-link {
   color: var(--color-on-surface-variant);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.16s ease, background 0.16s ease;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
-  font-weight: 500;
+  font-weight: 550;
 }
 
 .nav-link:hover {
   color: var(--color-on-surface);
-  background: var(--color-surface-container-high);
+  background: rgba(255,255,255,0.02);
 }
 
 .nav-link.active {
   color: var(--color-primary);
-  background: var(--color-surface-container-high);
+  background: linear-gradient(90deg, rgba(251,109,16,0.06), rgba(235,62,27,0.04));
 }
 
 /* ========== CARD STYLES ========== */
 .card {
-  background: var(--color-surface-container);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border: 1px solid var(--color-outline-variant);
   border-radius: 1rem;
   padding: 1.5rem;
-  transition: all 0.2s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-outline);
-  background: var(--color-surface-container-high);
+  transform: translateY(-6px);
+  border-color: rgba(235,62,27,0.12);
+  box-shadow: 0 20px 40px rgba(46,46,65,0.6);
 }
 
 /* ========== INPUT STYLES ========== */
 .input-field {
   width: 100%;
-  background: var(--color-surface-container-lowest);
+  background: rgba(255,255,255,0.02);
   border: 1px solid var(--color-outline-variant);
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
   color: var(--color-on-surface);
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  transition: box-shadow 0.16s ease, border-color 0.16s ease;
 }
 
 .input-field:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(133, 173, 255, 0.2);
+  box-shadow: 0 6px 20px rgba(251,109,16,0.12);
 }
 
 .input-field::placeholder {
-  color: var(--color-outline);
+  color: var(--color-on-surface-variant);
 }
 
 /* ========== LAYOUT UTILITIES ========== */
@@ -1994,42 +2544,155 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-surface-dim);
+  background: linear-gradient(180deg, var(--color-surface-dim), var(--color-surface-bright));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-surface-container-highest);
+  background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-outline);
+  filter: brightness(0.95);
 }
+
+/* ------------------ DESIGN SYSTEM (from DESIGN.md) ------------------ */
+
+/* Font utilities */
+.font-playfair { font-family: 'Playfair Display', serif; }
+.font-inter { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+
+/* Typography scales */
+.display-lg { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; line-height: 56px; letter-spacing: -0.02em; }
+.headline-lg { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; line-height: 40px; }
+.headline-lg-mobile { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; line-height: 36px; }
+.headline-md { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 500; line-height: 32px; }
+.body-lg { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 18px; font-weight: 400; line-height: 28px; }
+.body-md { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; }
+.label-md { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 600; line-height: 20px; letter-spacing: 0.05em; }
+.caption { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 12px; font-weight: 400; line-height: 16px; }
+
+/* Shapes */
+.rounded-lg { border-radius: 1rem; }
+.rounded-xl { border-radius: 1.5rem; }
+
+/* Sunset decorative elements */
+.sunset-circle {
+  position: absolute;
+  width: 680px;
+  height: 680px;
+  border-radius: 50%;
+  filter: blur(60px);
+  right: -180px;
+  top: -200px;
+  background: var(--sunset-gradient, linear-gradient(135deg, #FB6D10 0%, #EB3E1B 50%, #2E2E41 100%));
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.hero-decor {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.sunset-blob {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(251,109,16,0.24) 0%, rgba(235,62,27,0.18) 50%, rgba(255,179,122,0.06) 100%);
+  filter: blur(48px);
+  left: -90px;
+  bottom: -120px;
+  opacity: 0.85;
+}
+
+/* Glass card base following DESIGN.md */
+.glass-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Chip / Tag */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(251,109,16,0.12);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+/* Input focus glow */
+.input-glow:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 6px 24px rgba(251,109,16,0.12);
+}
+
+/* Progress bar */
+.progress-track {
+  background: rgba(255,255,255,0.04);
+  height: 12px;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  border-radius: 9999px;
+}
+
+/* Small utilities */
+.text-muted { color: var(--color-on-surface-variant); }
+.text-accent { color: var(--color-primary); }
+
+@media (max-width: 768px) {
+  .display-lg { font-size: 34px; line-height: 42px; }
+  .headline-lg { font-size: 28px; line-height: 36px; }
+  .headline-md { font-size: 20px; line-height: 28px; }
+  .hero-decor .sunset-circle {
+    width: 520px;
+    height: 520px;
+    right: -130px;
+    top: -140px;
+    filter: blur(50px);
+  }
+  .hero-decor .sunset-blob {
+    width: 320px;
+    height: 320px;
+    left: -60px;
+    bottom: -80px;
+    filter: blur(40px);
+    opacity: 0.72;
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.page-section {
+  padding: 3rem 1rem 2rem;
+}
+
+@media (min-width: 768px) {
+  .page-section {
+    padding: 4.5rem 2rem 3rem;
+  }
+}
+
+/* End design system */
 
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
-</file>
-
-<file path="src/lib/supabase.ts">
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storage: localStorage,
-  },
-});
-
-// Log auth events for debugging (remove later)
-supabase.auth.onAuthStateChange((event, session) => {
-  console.log('🔐 Supabase Auth Event:', event, session?.user?.email);
-});
 </file>
 
 <file path="src/pages/AuthPage.tsx">
@@ -2091,11 +2754,11 @@ const AuthPage = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="pt-48 pb-32 px-4"
+      className="page-section px-4"
     >
       <div className="max-w-md mx-auto">
-        <div className="bg-surface-container-high rounded-2xl p-8 shadow-xl border border-outline/20">
-          <h1 className="text-3xl font-bold text-center mb-8">
+        <div className="glass-card rounded-lg p-8 shadow-xl border border-outline/20">
+          <h1 className="headline-md font-playfair text-center mb-8">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
 
@@ -2107,7 +2770,7 @@ const AuthPage = () => {
 
           <form onSubmit={handleAuth} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block label-md mb-2">
                 Email
               </label>
               <input
@@ -2115,14 +2778,14 @@ const AuthPage = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
                 placeholder="you@example.com"
                 disabled={loading}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block label-md mb-2">
                 Password
               </label>
               <input
@@ -2130,7 +2793,7 @@ const AuthPage = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
                 placeholder="••••••••"
                 disabled={loading}
               />
@@ -2139,7 +2802,7 @@ const AuthPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-xl btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
             </button>

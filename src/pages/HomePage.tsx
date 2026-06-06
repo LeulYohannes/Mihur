@@ -16,70 +16,31 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Search State
   const [searchQuery, setSearchQuery] = useState('');
-  
 
   useEffect(() => {
-    // Add this at the top of HomePage component
-const testSupabase = async () => {
-  console.log('Testing Supabase connection...');
-  const { data: cats, error: catErr } = await supabase.from('categories').select('id').limit(1);
-  console.log('Categories test:', catErr ? 'ERROR' : 'OK', catErr?.message);
-  
-  const { data: coursesTest, error: courseErr } = await supabase.from('courses').select('id').limit(1);
-  console.log('Courses test:', courseErr ? 'ERROR' : 'OK', courseErr?.message);
-  
-  const { data: profilesTest, error: profErr } = await supabase.from('user_profiles').select('user_id').limit(1);
-  console.log('User_profiles test:', profErr ? 'ERROR' : 'OK', profErr?.message);
-  
-  const { data: savedTest, error: savedErr } = await supabase.from('saved_courses').select('id').limit(1);
-  console.log('Saved_courses test:', savedErr ? 'ERROR' : 'OK', savedErr?.message);
-};
-
-// Call it inside useEffect, after fetchData or before
-testSupabase();
     const fetchData = async () => {
-      // 1. Fetch Categories and Courses
       const [catResponse, courseResponse] = await Promise.all([
         supabase.from('categories').select('*').limit(6),
-        supabase.from('courses').select('*') // Fetches all so we can search them
+        supabase.from('courses').select('*')
       ]);
 
-      if (catResponse.error) {
-        console.error('Categories fetch failed', catResponse.error);
-        setError(catResponse.error.message);
-      }
-      if (courseResponse.error) {
-        console.error('Courses fetch failed', courseResponse.error);
-        setError(courseResponse.error.message);
-      }
+      if (catResponse.error) console.error('Categories fetch failed', catResponse.error);
+      if (courseResponse.error) console.error('Courses fetch failed', courseResponse.error);
       if (catResponse.data) setCategories(catResponse.data);
       if (courseResponse.data) setCourses(courseResponse.data);
 
-      // 2. PHASE 6: Recommendation Engine
       if (user) {
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile } = await supabase
           .from('user_profiles')
           .select('category, skill_level')
           .eq('user_id', user.id)
-          .limit(1)
           .maybeSingle();
-
-        if (profileError) {
-          console.error('Profile fetch failed', profileError);
-          // User profile lookup should not stop the main course listing from rendering.
-        }
 
         if (profile && profile.category) {
           let query = supabase.from('courses').select('*').eq('category_id', profile.category);
           if (profile.skill_level) query = query.eq('level', profile.skill_level);
-          
-          const { data: recommendations, error: recommendationsError } = await query.limit(4);
-          if (recommendationsError) {
-            console.error('Recommendations fetch failed', recommendationsError);
-            setError(recommendationsError.message);
-          }
+          const { data: recommendations } = await query.limit(4);
           if (recommendations) setRecommendedCourses(recommendations);
         }
       }
@@ -89,18 +50,13 @@ testSupabase();
     fetchData();
   }, [user]);
 
-  // Search Filter Logic
   const filteredCourses = courses.filter(course => 
     course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     course.provider.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-10 h-10 text-primary" />
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
   }
 
   if (error) {
@@ -116,16 +72,21 @@ testSupabase();
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      {/* Hero Section */}
-      <section className="pt-48 pb-32 px-8 max-w-7xl mx-auto text-center relative">
+      {/* Hero Section with sunset decorations */}
+      <section className="page-section max-w-7xl mx-auto text-center relative overflow-hidden">
+        {/* Sunset decorations – all inside hero-decor */}
         <div className="hero-decor">
           <div className="sunset-circle" />
           <div className="sunset-blob" />
+          <div className="sunset-bubble-1" />
+          <div className="sunset-bubble-2" />
+          <div className="sunset-bubble-3" />
         </div>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="display-lg font-playfair tracking-tight mb-8 max-w-5xl mx-auto leading-[0.95] text-on-surface"
+          className="display-lg font-playfair tracking-tight mb-8 max-w-4xl mx-auto leading-[0.95] text-on-surface relative z-10"
         >
           Find the Best Free Courses, Fast
         </motion.h1>
@@ -133,16 +94,15 @@ testSupabase();
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="body-lg text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed"
+          className="body-lg text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed relative z-10"
         >
           Discover thousands of free courses from Coursera, edX, Khan Academy, and FutureLearn in one place.
         </motion.p>
 
-        {/* Working Search Bar */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-3xl mx-auto relative group"
+          className="max-w-3xl mx-auto relative group z-10"
         >
           <div className="flex items-center bg-surface-container-highest rounded-2xl p-2 ghost-border group-focus-within:ring-2 group-focus-within:ring-primary/30 transition-all duration-300 editorial-shadow">
             <Search className="ml-4 w-6 h-6 text-on-surface-variant" />
@@ -157,9 +117,9 @@ testSupabase();
         </motion.div>
       </section>
 
-      {/* Recommended Section (PHASE 6) - ONLY shows if logged in AND has profile */}
+      {/* Recommended Section */}
       {user && recommendedCourses.length > 0 && !searchQuery && (
-        <section className="py-16 max-w-7xl mx-auto px-8">
+        <section className="page-section max-w-7xl mx-auto">
           <div className="mb-12 flex items-center justify-between bg-primary/10 p-8 rounded-3xl border border-primary/20">
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -180,11 +140,11 @@ testSupabase();
         </section>
       )}
 
-      {/* Categories Section - Hides when searching */}
+      {/* Categories Section */}
       {!searchQuery && (
-        <section className="bg-surface-container-low py-32">
-          <div className="max-w-7xl mx-auto px-8">
-            <div className="flex items-end justify-between mb-16">
+        <section className="bg-surface-container-low page-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-16 gap-4">
               <div>
                 <h2 className="text-4xl font-bold tracking-tight">Explore by Category</h2>
               </div>
@@ -193,17 +153,17 @@ testSupabase();
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
               {categories.map((cat) => <CategoryCard key={cat.id} category={cat} />)}
             </div>
           </div>
         </section>
       )}
 
-      {/* Courses Section (Updates based on search!) */}
-      <section className="py-32 max-w-7xl mx-auto px-8">
-        <div className="mb-16">
-          <h2 className="text-5xl font-bold tracking-tight">
+      {/* Courses Section */}
+      <section className="page-section max-w-7xl mx-auto">
+        <div className="mb-10">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
             {searchQuery ? `Search Results for "${searchQuery}"` : "Popular Free Courses"}
           </h2>
         </div>
@@ -216,7 +176,6 @@ testSupabase();
           </div>
         ) : (
           <div className="text-center py-20 text-on-surface-variant">
-            {/* HERE IS THE LINE THAT WAS BROKEN! IT NOW HAS THE CLOSING TAG properly -> /> */}
             <Search className="w-12 h-12 mx-auto mb-4 opacity-20" />
             <p className="text-xl">No courses found matching "{searchQuery}"</p>
           </div>
