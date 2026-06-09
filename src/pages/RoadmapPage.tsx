@@ -4,6 +4,7 @@ import { CheckCircle, Circle, Loader2, Plus, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { generateRoadmapLocal } from '../utils/roadmapGenerator';
 
 interface Roadmap {
   id: string;
@@ -150,41 +151,58 @@ const RoadmapPage = () => {
       return;
     }
 
-    // Call the Edge Function
-    const { data, error } = await supabase.functions.invoke('generate-roadmap', {
-      body: JSON.stringify({
+    try {
+      // Generate roadmap locally (no Edge Function, no Gemini)
+      const roadmapData = await generateRoadmapLocal({
         user_id: user!.id,
         category: profile.category,
         skill_level: profile.skill_level,
         goal: profile.goal,
-        weekly_hours: profile.weekly_hours
-      })
-    });
+        weekly_hours: profile.weekly_hours,
+      });
 
-    if (error) {
-      console.error('Edge Function error:', error);
-      // Try to extract detailed message from the response
-      let detail = error.message;
-      if (error.context?.body) {
-        try {
-          const parsed = JSON.parse(error.context.body);
-          detail = parsed.error || parsed.message || detail;
-        } catch (e) {
-          // ignore
-        }
-      }
-      setError(`Failed to generate roadmap: ${detail}`);
-    } else if (data?.error) {
-      setError(`Edge Function error: ${data.error}`);
-    } else {
-      // Success – refresh roadmaps and select the new one
+      // Insert roadmap into database
+      const { data: roadmap, error: roadmapError } = await supabase
+        .from('user_roadmaps')
+        .insert({
+          user_id: user!.id,
+          title: roadmapData.title,
+          description: roadmapData.description,
+          category_id: profile.category,
+          total_steps: roadmapData.steps.length,
+        })
+        .select()
+        .single();
+
+      if (roadmapError) throw roadmapError;
+
+      // Insert steps
+      const stepsWithOrder = roadmapData.steps.map((step, idx) => ({
+        roadmap_id: roadmap.id,
+        title: step.title,
+        description: step.description,
+        step_order: idx + 1,
+        estimated_hours: step.estimated_hours,
+        course_id: step.course_id,
+      }));
+
+      const { error: stepsError } = await supabase
+        .from('roadmap_steps')
+        .insert(stepsWithOrder);
+
+      if (stepsError) throw stepsError;
+
+      // Refresh the page
       await fetchRoadmaps();
-      if (data?.roadmap) {
-        setSelectedRoadmap(data.roadmap);
-        await fetchSteps(data.roadmap.id);
-      }
+      setSelectedRoadmap(roadmap);
+      await fetchSteps(roadmap.id);
+      
+    } catch (err: any) {
+      console.error('Roadmap generation error:', err);
+      setError('Failed to generate roadmap: ' + err.message);
+    } finally {
+      setGenerating(false);
     }
-    setGenerating(false);
   };
 
   if (loading) {

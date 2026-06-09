@@ -87,13 +87,14 @@ const QuestionnairePage = () => {
 
     setSaving(false);
     
-    if (!error) {
-      setSaved(true);
-      // Hide the "Saved!" message after 3 seconds
-      setTimeout(() => setSaved(false), 3000);
-    } else {
-      alert('Error saving preferences: ' + error.message);
-    }
+  if (!error) {
+  setSaved(true);
+  setTimeout(() => {
+    setSaved(false);
+    // Redirect to roadmap page after successful save
+    window.location.href = '/roadmap';
+  }, 1500);
+}
   };
 
   const reset = () => {
