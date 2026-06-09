@@ -80,10 +80,26 @@ const RoadmapPage = () => {
   const toggleStep = async (step: Step) => {
     const newCompleted = !step.is_completed;
     
-    // Optimistic update
-    setSteps(prev => prev.map(s => 
-      s.id === step.id ? { ...s, is_completed: newCompleted } : s
-    ));
+    // Optimistic update for steps and progress bar
+    setSteps(prevSteps => {
+      const updatedSteps = prevSteps.map(s =>
+        s.id === step.id ? { ...s, is_completed: newCompleted } : s
+      );
+      
+      // Immediately recalculate progress and update the selected roadmap UI
+      if (selectedRoadmap) {
+        const completedCount = updatedSteps.filter(s => s.is_completed).length;
+        const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
+        
+        setSelectedRoadmap(prev => prev ? {
+          ...prev,
+          completed_steps: completedCount,
+          progress_percent: progressPercent
+        } : null);
+      }
+      
+      return updatedSteps;
+    });
 
     // Update database
     const { error } = await supabase
@@ -97,15 +113,29 @@ const RoadmapPage = () => {
     if (error) {
       console.error('Toggle step error:', error);
       // Revert optimistic update
-      setSteps(prev => prev.map(s => 
-        s.id === step.id ? { ...s, is_completed: !newCompleted } : s
-      ));
+      setSteps(prevSteps =>
+        prevSteps.map(s =>
+          s.id === step.id ? { ...s, is_completed: !newCompleted } : s
+        )
+      );
+      if (selectedRoadmap) {
+        const revertedSteps = steps.map(s =>
+          s.id === step.id ? { ...s, is_completed: !newCompleted } : s
+        );
+        const completedCount = revertedSteps.filter(s => s.is_completed).length;
+        const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
+        setSelectedRoadmap({
+          ...selectedRoadmap,
+          completed_steps: completedCount,
+          progress_percent: progressPercent
+        });
+      }
       return;
     }
 
-    // Recalculate progress for the roadmap
+    // After successful DB update, sync the roadmap progress in the database
     if (selectedRoadmap) {
-      const updatedSteps = steps.map(s => 
+      const updatedSteps = steps.map(s =>
         s.id === step.id ? { ...s, is_completed: newCompleted } : s
       );
       const completedCount = updatedSteps.filter(s => s.is_completed).length;
@@ -118,12 +148,6 @@ const RoadmapPage = () => {
           progress_percent: progressPercent
         })
         .eq('id', selectedRoadmap.id);
-      
-      setSelectedRoadmap({
-        ...selectedRoadmap,
-        completed_steps: completedCount,
-        progress_percent: progressPercent
-      });
     }
   };
 

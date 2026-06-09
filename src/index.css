@@ -211,6 +211,10 @@ body {
   filter: brightness(0.95);
 }
 
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* ------------------ DESIGN SYSTEM (from DESIGN.md) ------------------ */
 
 /* Font utilities */
@@ -231,7 +235,7 @@ body {
 .rounded-lg { border-radius: 1rem; }
 .rounded-xl { border-radius: 1.5rem; }
 
-/* ========== SUNSET DECORATIONS (FIXED – always visible) ========== */
+/* ========== SUNSET DECORATIONS ========== */
 .hero-decor {
   position: absolute;
   inset: 0;
@@ -246,7 +250,6 @@ section.relative {
   isolation: isolate;
 }
 
-/* Base sunset circle */
 .sunset-circle {
   position: absolute;
   width: 680px;
@@ -260,7 +263,6 @@ section.relative {
   z-index: -1;
 }
 
-/* Additional bubbles */
 .sunset-bubble-1 {
   position: absolute;
   width: 480px;
@@ -300,7 +302,6 @@ section.relative {
   z-index: -1;
 }
 
-/* Original sunset blob */
 .hero-decor .sunset-blob {
   position: absolute;
   width: 420px;
@@ -406,8 +407,4 @@ section.relative {
   .page-section {
     padding: 4.5rem 2rem 3rem;
   }
-}
-
-::-webkit-scrollbar-corner {
-  background: transparent;
 }
