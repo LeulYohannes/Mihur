@@ -31,37 +31,49 @@ const RoadmapPage = () => {
   const [steps, setSteps] = useState<Step[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     fetchRoadmaps();
   }, [user]);
 
   const fetchRoadmaps = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('user_roadmaps')
       .select('*')
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
     
-    if (data) {
+    if (error) {
+      console.error('Fetch roadmaps error:', error);
+      setError(error.message);
+    } else if (data) {
       setRoadmaps(data);
       if (data.length > 0 && !selectedRoadmap) {
         setSelectedRoadmap(data[0]);
-        fetchSteps(data[0].id);
+        await fetchSteps(data[0].id);
       }
     }
     setLoading(false);
   };
 
   const fetchSteps = async (roadmapId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('roadmap_steps')
       .select('*')
       .eq('roadmap_id', roadmapId)
       .order('step_order', { ascending: true });
     
-    if (data) setSteps(data);
+    if (error) {
+      console.error('Fetch steps error:', error);
+      setError(error.message);
+    } else if (data) {
+      setSteps(data);
+    }
   };
 
   const toggleStep = async (step: Step) => {
@@ -81,8 +93,17 @@ const RoadmapPage = () => {
       })
       .eq('id', step.id);
 
-    if (!error && selectedRoadmap) {
-      // Recalculate progress
+    if (error) {
+      console.error('Toggle step error:', error);
+      // Revert optimistic update
+      setSteps(prev => prev.map(s => 
+        s.id === step.id ? { ...s, is_completed: !newCompleted } : s
+      ));
+      return;
+    }
+
+    // Recalculate progress for the roadmap
+    if (selectedRoadmap) {
       const updatedSteps = steps.map(s => 
         s.id === step.id ? { ...s, is_completed: newCompleted } : s
       );
@@ -97,7 +118,6 @@ const RoadmapPage = () => {
         })
         .eq('id', selectedRoadmap.id);
       
-      // Update local roadmap
       setSelectedRoadmap({
         ...selectedRoadmap,
         completed_steps: completedCount,
@@ -108,23 +128,30 @@ const RoadmapPage = () => {
 
   const generateRoadmap = async () => {
     setGenerating(true);
+    setError(null);
     
-    // Fetch user profile
-    const { data: profile } = await supabase
+    // Fetch user profile (questionnaire answers)
+    const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
-      .select('*')
+      .select('category, skill_level, goal, weekly_hours')
       .eq('user_id', user!.id)
-      .single();
+      .maybeSingle();
 
-    if (!profile?.category) {
-      alert('Please complete the questionnaire first');
+    if (profileError) {
+      console.error('Profile fetch error:', profileError);
+      setError('Could not fetch your profile. Please try again.');
       setGenerating(false);
       return;
     }
 
-    const response = await fetch('/api/generate-roadmap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    if (!profile || !profile.category) {
+      setError('Please complete the questionnaire first.');
+      setGenerating(false);
+      return;
+    }
+
+    // Call the Edge Function
+    const { data, error } = await supabase.functions.invoke('generate-roadmap', {
       body: JSON.stringify({
         user_id: user!.id,
         category: profile.category,
@@ -134,15 +161,39 @@ const RoadmapPage = () => {
       })
     });
 
-    if (response.ok) {
-      fetchRoadmaps();
+    if (error) {
+      console.error('Edge Function error:', error);
+      // Try to extract detailed message from the response
+      let detail = error.message;
+      if (error.context?.body) {
+        try {
+          const parsed = JSON.parse(error.context.body);
+          detail = parsed.error || parsed.message || detail;
+        } catch (e) {
+          // ignore
+        }
+      }
+      setError(`Failed to generate roadmap: ${detail}`);
+    } else if (data?.error) {
+      setError(`Edge Function error: ${data.error}`);
     } else {
-      alert('Failed to generate roadmap. Try again later.');
+      // Success – refresh roadmaps and select the new one
+      await fetchRoadmaps();
+      if (data?.roadmap) {
+        setSelectedRoadmap(data.roadmap);
+        await fetchSteps(data.roadmap.id);
+      }
     }
     setGenerating(false);
   };
 
-  if (loading) return <div className="pt-32 flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin w-10 h-10 text-primary" />
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -171,6 +222,12 @@ const RoadmapPage = () => {
           Generate New Roadmap
         </button>
       </div>
+
+      {error && (
+        <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
+          {error}
+        </div>
+      )}
 
       {/* Roadmap Selector */}
       {roadmaps.length > 0 && (
@@ -202,7 +259,7 @@ const RoadmapPage = () => {
             <h2 className="headline-md font-playfair mb-2">{selectedRoadmap.title}</h2>
             <p className="text-on-surface-variant mb-6">{selectedRoadmap.description}</p>
             
-            {/* Progress Bar using design tokens */}
+            {/* Progress Bar */}
             <div className="mb-4">
               <div className="flex justify-between text-sm mb-2">
                 <span>Overall Progress</span>
@@ -224,7 +281,7 @@ const RoadmapPage = () => {
           <div className="space-y-4">
             <h3 className="text-2xl font-bold mb-4">Learning Path</h3>
             <AnimatePresence>
-              {steps.map((step, idx) => (
+              {steps.map((step) => (
                 <motion.div
                   key={step.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -266,7 +323,7 @@ const RoadmapPage = () => {
         </motion.div>
       )}
 
-      {roadmaps.length === 0 && !generating && (
+      {roadmaps.length === 0 && !generating && !error && (
         <div className="text-center py-20 bg-surface-container-high rounded-3xl">
           <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <TrendingUp className="w-10 h-10 text-primary" />
@@ -275,7 +332,7 @@ const RoadmapPage = () => {
           <p className="text-on-surface-variant mb-8 max-w-md mx-auto">
             Complete the questionnaire to get a personalized learning roadmap.
           </p>
-          <Link to="/questionaire" className="btn-primary">
+          <Link to="/questionnaire" className="btn-primary">
             Complete Questionnaire
           </Link>
         </div>

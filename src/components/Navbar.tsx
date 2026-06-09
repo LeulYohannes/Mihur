@@ -6,9 +6,9 @@ const NAV_LINKS = [
   { label: 'Explore', to: '/' },
   { label: 'Categories', to: '/categories' },
   { label: 'My Learning', to: '/my-learning' },
+  { label: 'Roadmap', to: '/roadmap' },      // ← add this line
   { label: 'Questionnaire', to: '/questionnaire' },
 ];
-
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
