@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Circle, Loader2, Plus, TrendingUp } from 'lucide-react';
+import { CheckCircle, Circle, Loader2, Plus, TrendingUp, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -57,6 +57,9 @@ const RoadmapPage = () => {
       if (data.length > 0 && !selectedRoadmap) {
         setSelectedRoadmap(data[0]);
         await fetchSteps(data[0].id);
+      } else if (data.length === 0) {
+        setSelectedRoadmap(null);
+        setSteps([]);
       }
     }
     setLoading(false);
@@ -77,16 +80,46 @@ const RoadmapPage = () => {
     }
   };
 
+  const deleteRoadmap = async (roadmapId: string, roadmapTitle: string) => {
+    if (!confirm(`Are you sure you want to delete the roadmap "${roadmapTitle}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from('user_roadmaps')
+      .delete()
+      .eq('id', roadmapId);
+
+    if (error) {
+      console.error('Delete roadmap error:', error);
+      setError('Failed to delete roadmap. Please try again.');
+      return;
+    }
+
+    // Remove from local state
+    const updatedRoadmaps = roadmaps.filter(r => r.id !== roadmapId);
+    setRoadmaps(updatedRoadmaps);
+
+    // If the deleted roadmap was selected, select the first remaining or null
+    if (selectedRoadmap?.id === roadmapId) {
+      if (updatedRoadmaps.length > 0) {
+        setSelectedRoadmap(updatedRoadmaps[0]);
+        await fetchSteps(updatedRoadmaps[0].id);
+      } else {
+        setSelectedRoadmap(null);
+        setSteps([]);
+      }
+    }
+  };
+
   const toggleStep = async (step: Step) => {
     const newCompleted = !step.is_completed;
     
-    // Optimistic update for steps and progress bar
     setSteps(prevSteps => {
       const updatedSteps = prevSteps.map(s =>
         s.id === step.id ? { ...s, is_completed: newCompleted } : s
       );
       
-      // Immediately recalculate progress and update the selected roadmap UI
       if (selectedRoadmap) {
         const completedCount = updatedSteps.filter(s => s.is_completed).length;
         const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
@@ -101,7 +134,6 @@ const RoadmapPage = () => {
       return updatedSteps;
     });
 
-    // Update database
     const { error } = await supabase
       .from('roadmap_steps')
       .update({ 
@@ -112,7 +144,6 @@ const RoadmapPage = () => {
 
     if (error) {
       console.error('Toggle step error:', error);
-      // Revert optimistic update
       setSteps(prevSteps =>
         prevSteps.map(s =>
           s.id === step.id ? { ...s, is_completed: !newCompleted } : s
@@ -133,7 +164,6 @@ const RoadmapPage = () => {
       return;
     }
 
-    // After successful DB update, sync the roadmap progress in the database
     if (selectedRoadmap) {
       const updatedSteps = steps.map(s =>
         s.id === step.id ? { ...s, is_completed: newCompleted } : s
@@ -155,7 +185,6 @@ const RoadmapPage = () => {
     setGenerating(true);
     setError(null);
     
-    // Fetch user profile (questionnaire answers)
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select('category, skill_level, goal, weekly_hours')
@@ -176,7 +205,6 @@ const RoadmapPage = () => {
     }
 
     try {
-      // Generate roadmap locally (no Edge Function, no Gemini)
       const roadmapData = await generateRoadmapLocal({
         user_id: user!.id,
         category: profile.category,
@@ -185,7 +213,6 @@ const RoadmapPage = () => {
         weekly_hours: profile.weekly_hours,
       });
 
-      // Insert roadmap into database
       const { data: roadmap, error: roadmapError } = await supabase
         .from('user_roadmaps')
         .insert({
@@ -200,7 +227,6 @@ const RoadmapPage = () => {
 
       if (roadmapError) throw roadmapError;
 
-      // Insert steps
       const stepsWithOrder = roadmapData.steps.map((step, idx) => ({
         roadmap_id: roadmap.id,
         title: step.title,
@@ -216,7 +242,6 @@ const RoadmapPage = () => {
 
       if (stepsError) throw stepsError;
 
-      // Refresh the page
       await fetchRoadmaps();
       setSelectedRoadmap(roadmap);
       await fetchSteps(roadmap.id);
@@ -271,25 +296,36 @@ const RoadmapPage = () => {
         </div>
       )}
 
-      {/* Roadmap Selector */}
+      {/* Roadmap Selector with Delete Buttons */}
       {roadmaps.length > 0 && (
         <div className="flex gap-4 mb-8 overflow-x-auto pb-4">
           {roadmaps.map(roadmap => (
-            <button
-              key={roadmap.id}
-              onClick={() => {
-                setSelectedRoadmap(roadmap);
-                fetchSteps(roadmap.id);
-              }}
-              className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md ${
-                selectedRoadmap?.id === roadmap.id
-                  ? 'accent-gradient text-on-primary'
-                  : 'glass-card text-on-surface'
-              }`}
-            >
-              {roadmap.title}
-              <span className="ml-2 text-sm opacity-70">{roadmap.progress_percent}%</span>
-            </button>
+            <div key={roadmap.id} className="relative group">
+              <button
+                onClick={() => {
+                  setSelectedRoadmap(roadmap);
+                  fetchSteps(roadmap.id);
+                }}
+                className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md pr-10 ${
+                  selectedRoadmap?.id === roadmap.id
+                    ? 'accent-gradient text-on-primary'
+                    : 'glass-card text-on-surface'
+                }`}
+              >
+                {roadmap.title}
+                <span className="ml-2 text-sm opacity-70">{roadmap.progress_percent}%</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteRoadmap(roadmap.id, roadmap.title);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Delete roadmap"
+              >
+                <X className="w-4 h-4 text-current opacity-70 hover:opacity-100" />
+              </button>
+            </div>
           ))}
         </div>
       )}
@@ -301,7 +337,6 @@ const RoadmapPage = () => {
             <h2 className="headline-md font-playfair mb-2">{selectedRoadmap.title}</h2>
             <p className="text-on-surface-variant mb-6">{selectedRoadmap.description}</p>
             
-            {/* Progress Bar */}
             <div className="mb-4">
               <div className="flex justify-between text-sm mb-2">
                 <span>Overall Progress</span>
@@ -319,7 +354,6 @@ const RoadmapPage = () => {
             </p>
           </div>
 
-          {/* Steps Checklist */}
           <div className="space-y-4">
             <h3 className="text-2xl font-bold mb-4">Learning Path</h3>
             <AnimatePresence>
