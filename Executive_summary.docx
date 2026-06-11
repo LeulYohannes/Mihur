@@ -1,0 +1,49 @@
+# Mihur – Executive Summary
+
+**Problem**  
+Millions of free online courses exist (Coursera, edX, Khan Academy, YouTube), but learners struggle to find the right sequence, track progress, and stay motivated. Most platforms are simple search engines – they don’t build a roadmap or adapt to the learner’s pace.
+
+**Solution**  
+Mihur is a web platform that generates personalised learning roadmaps. Users complete a short questionnaire (goal, skill level, weekly hours). Mihur then:
+- Pulls relevant free courses from a curated database.
+- Automatically orders them from beginner to advanced.
+- Adds recommended YouTube videos as supplementary material.
+- Provides a checklist with progress bar and the ability to like videos.
+- Centralises saved courses, roadmaps, and favourites in a “My Learning” dashboard.
+
+No AI costs, no external API quotas (YouTube fallback is optional and cheap).
+
+**Current Status**  
+Fully functional MVP deployed on Vercel + Supabase. Core features:
+- Authentication (email/password).
+- Course discovery by category and search.
+- Questionnaire to capture user preferences.
+- Rule‑based roadmap generator (no generic placeholder steps).
+- YouTube integration via secure Edge Function (user‑liked videos saved).
+- My Learning page with three tabs: saved courses, user roadmaps, favourite videos.
+
+**Tech Stack**  
+- Frontend: React 19, TypeScript, Tailwind CSS, Framer Motion.
+- Backend: Supabase (PostgreSQL, Auth, RLS, Edge Functions).
+- External API: YouTube Data API v3 (proxied through Supabase Edge Function).
+- Hosting: Vercel (frontend), Supabase (backend).
+
+**Metrics (as of today)**  
+- ~12 categories, growing course database (manually curated).
+- Users can generate unlimited roadmaps; each generation uses 0 AI credits – only database reads and optional YouTube searches.
+- YouTube API free tier: 10,000 quota units/day (~100 searches). Enough for early usage.
+
+**Next Steps (0–3 months)**  
+- Allow users to reorder steps manually.
+- Add “explain this concept” feature using Groq API (low‑cost LLM) – on user demand, not per roadmap.
+- Implement caching for YouTube results to reduce quota.
+- Open course submission form for community contributions.
+
+**Why Mihur is different**  
+- No vague AI roadmap generation – uses real, pre‑vetted courses and videos.
+- Zero generic filler steps (no “do an exercise”).
+- Puts control in the user’s hands: they can like videos, delete roadmaps, track progress.
+- Lightweight and cheap to run – no surprise bills.
+
+**Funding / Support**  
+Self‑funded, no external investment yet. Open to strategic partnerships with educational content providers.
