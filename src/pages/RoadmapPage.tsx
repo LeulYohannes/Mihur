@@ -85,6 +85,25 @@ const RoadmapPage = () => {
       return;
     }
 
+    // Optimistic update – remove from UI immediately
+    setRoadmaps(prevRoadmaps => {
+      const updated = prevRoadmaps.filter(r => r.id !== roadmapId);
+      
+      // Handle selection change if needed
+      if (selectedRoadmap?.id === roadmapId) {
+        if (updated.length > 0) {
+          setSelectedRoadmap(updated[0]);
+          fetchSteps(updated[0].id);
+        } else {
+          setSelectedRoadmap(null);
+          setSteps([]);
+        }
+      }
+      
+      return updated;
+    });
+
+    // Delete from database
     const { error } = await supabase
       .from('user_roadmaps')
       .delete()
@@ -93,22 +112,8 @@ const RoadmapPage = () => {
     if (error) {
       console.error('Delete roadmap error:', error);
       setError('Failed to delete roadmap. Please try again.');
-      return;
-    }
-
-    // Remove from local state
-    const updatedRoadmaps = roadmaps.filter(r => r.id !== roadmapId);
-    setRoadmaps(updatedRoadmaps);
-
-    // If the deleted roadmap was selected, select the first remaining or null
-    if (selectedRoadmap?.id === roadmapId) {
-      if (updatedRoadmaps.length > 0) {
-        setSelectedRoadmap(updatedRoadmaps[0]);
-        await fetchSteps(updatedRoadmaps[0].id);
-      } else {
-        setSelectedRoadmap(null);
-        setSteps([]);
-      }
+      // Revert optimistic update by refetching
+      await fetchRoadmaps();
     }
   };
 
@@ -296,17 +301,17 @@ const RoadmapPage = () => {
         </div>
       )}
 
-      {/* Roadmap Selector with Delete Buttons */}
+      {/* Roadmap Selector with visible X buttons */}
       {roadmaps.length > 0 && (
-        <div className="flex gap-4 mb-8 overflow-x-auto pb-4">
+        <div className="flex flex-wrap gap-4 mb-8">
           {roadmaps.map(roadmap => (
-            <div key={roadmap.id} className="relative group">
+            <div key={roadmap.id} className="flex items-center gap-1">
               <button
                 onClick={() => {
                   setSelectedRoadmap(roadmap);
                   fetchSteps(roadmap.id);
                 }}
-                className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md pr-10 ${
+                className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md ${
                   selectedRoadmap?.id === roadmap.id
                     ? 'accent-gradient text-on-primary'
                     : 'glass-card text-on-surface'
@@ -320,10 +325,10 @@ const RoadmapPage = () => {
                   e.stopPropagation();
                   deleteRoadmap(roadmap.id, roadmap.title);
                 }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 transition-colors"
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
                 aria-label="Delete roadmap"
               >
-                <X className="w-4 h-4 text-current opacity-70 hover:opacity-100" />
+                <X className="w-4 h-4 text-on-surface-variant hover:text-red-400" />
               </button>
             </div>
           ))}
