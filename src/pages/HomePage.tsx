@@ -72,9 +72,9 @@ const HomePage = () => {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      {/* Hero Section with sunset decorations */}
-      <section className="page-section max-w-7xl mx-auto text-center relative overflow-hidden">
-        {/* Sunset decorations – all inside hero-decor */}
+      {/* Hero Section – removed overflow-hidden so bubbles are not clipped */}
+      <section className="page-section max-w-7xl mx-auto text-center relative">
+        {/* Sunset decorations */}
         <div className="hero-decor">
           <div className="sunset-circle" />
           <div className="sunset-blob" />
