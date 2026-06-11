@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Loader2, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -24,13 +24,14 @@ const defaultAnswers: SurveyAnswers = {
 };
 
 const QuestionnairePage = () => {
-  const { user } = useAuth(); // Get the logged-in user!
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [answers, setAnswers] = useState<SurveyAnswers>(defaultAnswers);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Fetch existing profile data when the page loads
+  // Fetch existing profile data
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) {
@@ -42,7 +43,6 @@ const QuestionnairePage = () => {
         .from('user_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .limit(1)
         .maybeSingle();
 
       if (error) {
@@ -50,7 +50,6 @@ const QuestionnairePage = () => {
       }
 
       if (data) {
-        // Map database snake_case back to our frontend camelCase
         setAnswers({
           category: data.category || '',
           skillLevel: data.skill_level || '',
@@ -73,7 +72,6 @@ const QuestionnairePage = () => {
     setSaving(true);
     setSaved(false);
 
-    // Upsert means: "Insert if it doesn't exist, Update if it does"
     const { error } = await supabase.from('user_profiles').upsert({
       user_id: user.id,
       category: answers.category,
@@ -86,15 +84,16 @@ const QuestionnairePage = () => {
     });
 
     setSaving(false);
-    
-  if (!error) {
-  setSaved(true);
-  setTimeout(() => {
-    setSaved(false);
-    // Redirect to roadmap page after successful save
-    window.location.href = '/roadmap';
-  }, 1500);
-}
+
+    if (!error) {
+      setSaved(true);
+      setTimeout(() => {
+        setSaved(false);
+        navigate('/roadmap'); // ✅ React Router navigation – no 404
+      }, 1500);
+    } else {
+      alert('Error saving preferences: ' + error.message);
+    }
   };
 
   const reset = () => {
@@ -103,20 +102,28 @@ const QuestionnairePage = () => {
   };
 
   if (loading) {
-    return <div className="pt-32 min-h-screen flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+    return (
+      <div className="pt-32 min-h-screen flex justify-center">
+        <Loader2 className="animate-spin w-10 h-10 text-primary" />
+      </div>
+    );
   }
 
-  // Protect the route: Don't let them fill it out if they aren't logged in
   if (!user) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-2xl mx-auto text-center min-h-screen">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="page-section max-w-2xl mx-auto text-center min-h-screen"
+      >
         <div className="bg-surface-container-high rounded-3xl p-12 shadow-xl border border-outline-variant/20">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8 text-primary" />
           </div>
           <h2 className="text-3xl font-bold mb-4 text-on-surface">Sign in to save your path</h2>
           <p className="text-on-surface-variant mb-8 leading-relaxed">
-            Create a free account to take the questionnaire and receive personalized course recommendations tailored to your goals.
+            Create a free account to take the questionnaire and receive personalized course
+            recommendations tailored to your goals.
           </p>
           <Link to="/auth" className="px-8 py-4 rounded-xl primary-gradient text-on-primary font-bold active:scale-95 transition-all inline-block">
             Sign In / Sign Up
@@ -145,7 +152,9 @@ const QuestionnairePage = () => {
 
       <form onSubmit={onSubmit} className="glass-card rounded-lg p-8 shadow-md border border-outline-variant/20 space-y-6">
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="category">Top area of interest</label>
+          <label className="block text-sm font-bold mb-2" htmlFor="category">
+            Top area of interest
+          </label>
           <select
             id="category"
             value={answers.category}
@@ -167,11 +176,18 @@ const QuestionnairePage = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="skillLevel">Current skill level</label>
+          <label className="block text-sm font-bold mb-2" htmlFor="skillLevel">
+            Current skill level
+          </label>
           <select
             id="skillLevel"
             value={answers.skillLevel}
-            onChange={(e) => setAnswers((prev) => ({ ...prev, skillLevel: e.target.value as SurveyAnswers['skillLevel'] }))}
+            onChange={(e) =>
+              setAnswers((prev) => ({
+                ...prev,
+                skillLevel: e.target.value as SurveyAnswers['skillLevel'],
+              }))
+            }
             className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
@@ -183,7 +199,9 @@ const QuestionnairePage = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="weeklyHours">Hours per week</label>
+          <label className="block text-sm font-bold mb-2" htmlFor="weeklyHours">
+            Hours per week
+          </label>
           <input
             id="weeklyHours"
             type="number"
@@ -195,13 +213,17 @@ const QuestionnairePage = () => {
             required
           />
         </div>
-          
+
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="reason">Reason for learning</label>
+          <label className="block text-sm font-bold mb-2" htmlFor="reason">
+            Reason for learning
+          </label>
           <select
             id="reason"
             value={answers.reason}
-            onChange={(e) => setAnswers((prev) => ({ ...prev, reason: e.target.value as SurveyAnswers['reason'] }))}
+            onChange={(e) =>
+              setAnswers((prev) => ({ ...prev, reason: e.target.value as SurveyAnswers['reason'] }))
+            }
             className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface input-glow"
             required
           >
@@ -211,13 +233,20 @@ const QuestionnairePage = () => {
             <option value="General">General interest</option>
           </select>
         </div>
-         
+
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="experience">Experience level</label>
+          <label className="block text-sm font-bold mb-2" htmlFor="experience">
+            Experience level
+          </label>
           <select
             id="experience"
             value={answers.experience}
-            onChange={(e) => setAnswers((prev) => ({ ...prev, experience: e.target.value as SurveyAnswers['experience'] }))}
+            onChange={(e) =>
+              setAnswers((prev) => ({
+                ...prev,
+                experience: e.target.value as SurveyAnswers['experience'],
+              }))
+            }
             className="w-full rounded-xl border border-outline/20 p-3 bg-surface-container-highest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
             required
           >
@@ -230,7 +259,9 @@ const QuestionnairePage = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="goal">Learning goal</label>
+          <label className="block text-sm font-bold mb-2" htmlFor="goal">
+            Learning goal
+          </label>
           <textarea
             id="goal"
             value={answers.goal}
@@ -243,26 +274,26 @@ const QuestionnairePage = () => {
         </div>
 
         <div className="flex flex-col md:flex-row items-center gap-4 pt-4">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={saving}
             className="w-full md:w-auto px-8 py-3 rounded-xl btn-primary transition-all disabled:opacity-70 flex items-center justify-center min-w-[160px]"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save Answers'}
           </button>
-          
-          <button 
-            type="button" 
-            onClick={reset} 
+
+          <button
+            type="button"
+            onClick={reset}
             className="w-full md:w-auto px-8 py-3 rounded-xl btn-secondary"
           >
             Clear Form
           </button>
 
           {saved && (
-            <motion.span 
-              initial={{ opacity: 0, x: -10 }} 
-              animate={{ opacity: 1, x: 0 }} 
+            <motion.span
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
               className="text-sm text-primary font-bold flex items-center gap-2"
             >
               🎉 Profile updated successfully!

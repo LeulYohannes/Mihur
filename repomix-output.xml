@@ -56,7 +56,6 @@ src/index.css
 src/lib/iconMap.ts
 src/lib/supabase.ts
 src/main.tsx
-src/pages/.npmrc
 src/pages/AuthPage.tsx
 src/pages/CategoriesPage.tsx
 src/pages/CategoryDetailPage.tsx
@@ -65,17 +64,23 @@ src/pages/MyLearningPage.tsx
 src/pages/Questionaire.tsx
 src/pages/RoadmapPage.tsx
 src/types.ts
+src/utils/roadmapGenerator.ts
 supabase/.branches/_current_branch
+supabase/.temp/cli-latest
+supabase/.temp/gotrue-version
+supabase/.temp/linked-project.json
+supabase/.temp/pooler-url
+supabase/.temp/postgres-version
+supabase/.temp/project-ref
+supabase/.temp/rest-version
+supabase/.temp/storage-migration
+supabase/.temp/storage-version
 tsconfig.json
 vite.config.ts
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
-
-<file path="supabase/.branches/_current_branch">
-main
-</file>
 
 <file path="DESIGN.md">
 ---
@@ -300,299 +305,129 @@ export const getIconComponent = (iconName: string | null | undefined) => {
 export default getIconComponent;
 </file>
 
-<file path="src/pages/.npmrc">
-engine-strict=false
-legacy-peer-deps=true
+<file path="src/utils/roadmapGenerator.ts">
+import { supabase } from '../lib/supabase';
+
+interface GenerateRoadmapParams {
+  user_id: string;
+  category: string;
+  skill_level: string;
+  goal: string;
+  weekly_hours: number;
+}
+
+interface GeneratedRoadmap {
+  title: string;
+  description: string;
+  steps: {
+    title: string;
+    description: string;
+    estimated_hours: number;
+    course_id: string | null;
+  }[];
+}
+
+export async function generateRoadmapLocal(params: GenerateRoadmapParams): Promise<GeneratedRoadmap> {
+  const { category, skill_level, goal, weekly_hours } = params;
+  
+  // Fetch courses in the chosen category, filtered by skill level
+  let { data: courses } = await supabase
+    .from('courses')
+    .select('*')
+    .eq('category_id', category)
+    .eq('level', skill_level)
+    .limit(10);
+  
+  // If no courses at that level, fallback to any level in the same category
+  if (!courses || courses.length === 0) {
+    const { data: fallbackCourses } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('category_id', category)
+      .limit(10);
+    courses = fallbackCourses || [];
+  }
+  
+  // Category name mapping for nicer titles
+  const categoryNames: Record<string, string> = {
+    tech: 'Technology',
+    business: 'Business',
+    science: 'Science',
+    design: 'Design',
+    languages: 'Languages',
+    arts: 'Arts',
+    marketing: 'Marketing',
+    health: 'Health',
+    math: 'Mathematics',
+  };
+  
+  const categoryName = categoryNames[category] || category;
+  const title = `${skill_level} ${categoryName} Roadmap: ${goal.substring(0, 60)}${goal.length > 60 ? '...' : ''}`;
+  const totalEstimatedHours = weekly_hours * 4; // approximate 4 weeks
+  const description = `A structured learning path to help you achieve "${goal}". Estimated total time: ~${totalEstimatedHours} hours.`;
+  
+  // Generate steps from available courses
+  const steps = courses.slice(0, 6).map((course) => ({
+    title: course.title,
+    description: course.description.substring(0, 120),
+    estimated_hours: Math.max(4, Math.min(20, Math.floor(totalEstimatedHours / 6))),
+    course_id: course.id,
+  }));
+  
+  // If we don't have enough courses, add generic learning steps
+  if (steps.length < 4) {
+    const genericSteps = [
+      { title: `Fundamentals of ${categoryName}`, description: `Learn the core concepts and principles of ${categoryName}.`, estimated_hours: 8, course_id: null },
+      { title: 'Hands‑on Practice', description: 'Apply your knowledge with practical exercises and projects.', estimated_hours: 12, course_id: null },
+      { title: 'Intermediate Topics', description: 'Dive deeper into advanced concepts and techniques.', estimated_hours: 15, course_id: null },
+      { title: 'Final Project', description: 'Build a real‑world project to demonstrate your skills.', estimated_hours: 20, course_id: null },
+    ];
+    const needed = 6 - steps.length;
+    steps.push(...genericSteps.slice(0, needed));
+  }
+  
+  return { title, description, steps };
+}
 </file>
 
-<file path="src/pages/RoadmapPage.tsx">
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Circle, Loader2, Plus, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+<file path="supabase/.branches/_current_branch">
+main
+</file>
 
-interface Roadmap {
-  id: string;
-  title: string;
-  description: string;
-  progress_percent: number;
-  total_steps: number;
-  completed_steps: number;
-}
+<file path="supabase/.temp/cli-latest">
+v2.105.0
+</file>
 
-interface Step {
-  id: string;
-  title: string;
-  description: string;
-  step_order: number;
-  is_completed: boolean;
-  estimated_hours: number;
-  course_id: string | null;
-}
+<file path="supabase/.temp/gotrue-version">
+v2.189.0
+</file>
 
-const RoadmapPage = () => {
-  const { user } = useAuth();
-  const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
-  const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null);
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
+<file path="supabase/.temp/linked-project.json">
+{"ref":"eilkqecvhedgqeqhioza","name":"Mihur","organization_id":"emczhxupvuuhaoarsddc","organization_slug":"emczhxupvuuhaoarsddc"}
+</file>
 
-  useEffect(() => {
-    if (!user) return;
-    fetchRoadmaps();
-  }, [user]);
+<file path="supabase/.temp/pooler-url">
+postgresql://postgres.eilkqecvhedgqeqhioza@aws-1-eu-west-2.pooler.supabase.com:5432/postgres
+</file>
 
-  const fetchRoadmaps = async () => {
-    const { data } = await supabase
-      .from('user_roadmaps')
-      .select('*')
-      .eq('user_id', user!.id)
-      .order('created_at', { ascending: false });
-    
-    if (data) {
-      setRoadmaps(data);
-      if (data.length > 0 && !selectedRoadmap) {
-        setSelectedRoadmap(data[0]);
-        fetchSteps(data[0].id);
-      }
-    }
-    setLoading(false);
-  };
+<file path="supabase/.temp/postgres-version">
+17.6.1.104
+</file>
 
-  const fetchSteps = async (roadmapId: string) => {
-    const { data } = await supabase
-      .from('roadmap_steps')
-      .select('*')
-      .eq('roadmap_id', roadmapId)
-      .order('step_order', { ascending: true });
-    
-    if (data) setSteps(data);
-  };
+<file path="supabase/.temp/project-ref">
+eilkqecvhedgqeqhioza
+</file>
 
-  const toggleStep = async (step: Step) => {
-    const newCompleted = !step.is_completed;
-    
-    // Optimistic update
-    setSteps(prev => prev.map(s => 
-      s.id === step.id ? { ...s, is_completed: newCompleted } : s
-    ));
+<file path="supabase/.temp/rest-version">
+v14.5
+</file>
 
-    // Update database
-    const { error } = await supabase
-      .from('roadmap_steps')
-      .update({ 
-        is_completed: newCompleted,
-        completed_at: newCompleted ? new Date().toISOString() : null
-      })
-      .eq('id', step.id);
+<file path="supabase/.temp/storage-migration">
+optimize-existing-functions-again
+</file>
 
-    if (!error && selectedRoadmap) {
-      // Recalculate progress
-      const updatedSteps = steps.map(s => 
-        s.id === step.id ? { ...s, is_completed: newCompleted } : s
-      );
-      const completedCount = updatedSteps.filter(s => s.is_completed).length;
-      const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
-      
-      await supabase
-        .from('user_roadmaps')
-        .update({ 
-          completed_steps: completedCount,
-          progress_percent: progressPercent
-        })
-        .eq('id', selectedRoadmap.id);
-      
-      // Update local roadmap
-      setSelectedRoadmap({
-        ...selectedRoadmap,
-        completed_steps: completedCount,
-        progress_percent: progressPercent
-      });
-    }
-  };
-
-  const generateRoadmap = async () => {
-    setGenerating(true);
-    
-    // Fetch user profile
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('user_id', user!.id)
-      .single();
-
-    if (!profile?.category) {
-      alert('Please complete the questionnaire first');
-      setGenerating(false);
-      return;
-    }
-
-    const response = await fetch('/api/generate-roadmap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: user!.id,
-        category: profile.category,
-        skill_level: profile.skill_level,
-        goal: profile.goal,
-        weekly_hours: profile.weekly_hours
-      })
-    });
-
-    if (response.ok) {
-      fetchRoadmaps();
-    } else {
-      alert('Failed to generate roadmap. Try again later.');
-    }
-    setGenerating(false);
-  };
-
-  if (loading) return <div className="pt-32 flex justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
-
-  if (!user) {
-    return (
-      <div className="pt-32 text-center px-4">
-        <div className="max-w-md mx-auto bg-surface-container-high rounded-3xl p-8">
-          <h2 className="text-3xl font-bold mb-4">Sign in to access your roadmap</h2>
-          <Link to="/auth" className="btn-primary">Sign In</Link>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-6xl mx-auto min-h-screen">
-      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
-        <div>
-          <h1 className="headline-lg font-playfair tracking-tight mb-2">Learning Roadmaps</h1>
-          <p className="body-md text-on-surface-variant">Track your progress toward your learning goals</p>
-        </div>
-        <button 
-          onClick={generateRoadmap}
-          disabled={generating}
-          className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
-        >
-          {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-          Generate New Roadmap
-        </button>
-      </div>
-
-      {/* Roadmap Selector */}
-      {roadmaps.length > 0 && (
-        <div className="flex gap-4 mb-8 overflow-x-auto pb-4">
-          {roadmaps.map(roadmap => (
-            <button
-              key={roadmap.id}
-              onClick={() => {
-                setSelectedRoadmap(roadmap);
-                fetchSteps(roadmap.id);
-              }}
-              className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md ${
-                selectedRoadmap?.id === roadmap.id
-                  ? 'accent-gradient text-on-primary'
-                  : 'glass-card text-on-surface'
-              }`}
-            >
-              {roadmap.title}
-              <span className="ml-2 text-sm opacity-70">{roadmap.progress_percent}%</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Selected Roadmap */}
-      {selectedRoadmap && (
-        <motion.div key={selectedRoadmap.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="glass-card rounded-lg p-8 mb-8">
-            <h2 className="headline-md font-playfair mb-2">{selectedRoadmap.title}</h2>
-            <p className="text-on-surface-variant mb-6">{selectedRoadmap.description}</p>
-            
-            {/* Progress Bar using design tokens */}
-            <div className="mb-4">
-              <div className="flex justify-between text-sm mb-2">
-                <span>Overall Progress</span>
-                <span>{selectedRoadmap.progress_percent}%</span>
-              </div>
-              <div className="progress-track">
-                <div 
-                  className="progress-fill transition-all duration-500"
-                  style={{ width: `${selectedRoadmap.progress_percent}%` }}
-                />
-              </div>
-            </div>
-            <p className="text-sm text-on-surface-variant">
-              {selectedRoadmap.completed_steps} of {selectedRoadmap.total_steps} steps completed
-            </p>
-          </div>
-
-          {/* Steps Checklist */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-bold mb-4">Learning Path</h3>
-            <AnimatePresence>
-              {steps.map((step, idx) => (
-                <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="glass-card rounded-lg p-5 border border-outline/20 hover:shadow-lg transition-all"
-                >
-                  <div className="flex items-start gap-4">
-                    <button onClick={() => toggleStep(step)} className="mt-1 flex-shrink-0">
-                      {step.is_completed ? (
-                        <CheckCircle className="w-6 h-6 text-primary" />
-                      ) : (
-                        <Circle className="w-6 h-6 text-on-surface-variant hover:text-primary transition-colors" />
-                      )}
-                    </button>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 flex-wrap mb-1">
-                        <span className="text-sm text-on-surface-variant font-mono">Step {step.step_order}</span>
-                        <span className="text-xs text-on-surface-variant">~{step.estimated_hours} hours</span>
-                      </div>
-                      <h4 className={`headline-md font-playfair mb-1 ${step.is_completed ? 'line-through text-on-surface-variant' : ''}`}>
-                        {step.title}
-                      </h4>
-                      <p className="text-on-surface-variant text-sm">{step.description}</p>
-                      {step.course_id && (
-                        <Link 
-                          to={`/category/${step.course_id}`}
-                          className="inline-flex items-center gap-1 text-primary text-sm mt-3 hover:underline"
-                        >
-                          View Recommended Course <TrendingUp className="w-3 h-3" />
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      )}
-
-      {roadmaps.length === 0 && !generating && (
-        <div className="text-center py-20 bg-surface-container-high rounded-3xl">
-          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <TrendingUp className="w-10 h-10 text-primary" />
-          </div>
-          <h3 className="text-2xl font-bold mb-2">No roadmaps yet</h3>
-          <p className="text-on-surface-variant mb-8 max-w-md mx-auto">
-            Complete the questionnaire to get a personalized learning roadmap.
-          </p>
-          <Link to="/questionaire" className="btn-primary">
-            Complete Questionnaire
-          </Link>
-        </div>
-      )}
-    </motion.div>
-  );
-};
-
-export default RoadmapPage;
+<file path="supabase/.temp/storage-version">
+v1.60.4
 </file>
 
 <file path="vite.config.ts">
@@ -1054,6 +889,76 @@ export const useAuth = () => {
 };
 </file>
 
+<file path="src/types.ts">
+// src/types.ts
+export interface Course {
+  id: string;
+  title: string;
+  provider: string;
+  duration: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  description: string;
+  image: string;
+  category_id: string; // Changed from categoryId to match DB
+  url: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  icon_name: string; // Changed from icon to icon_name
+  description: string;
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mihur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@500;600;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+</file>
+
 <file path="src/pages/MyLearningPage.tsx">
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -1168,76 +1073,6 @@ const MyLearningPage = () => {
 export default MyLearningPage;
 </file>
 
-<file path="src/types.ts">
-// src/types.ts
-export interface Course {
-  id: string;
-  title: string;
-  provider: string;
-  duration: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
-  description: string;
-  image: string;
-  category_id: string; // Changed from categoryId to match DB
-  url: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  icon_name: string; // Changed from icon to icon_name
-  description: string;
-}
-</file>
-
-<file path="tsconfig.json">
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-    "module": "ESNext",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "allowJs": true,
-    "jsx": "react-jsx",
-    "types": ["vite/client"],
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "allowImportingTsExtensions": true,
-    "noEmit": true
-  }
-}
-</file>
-
-<file path="index.html">
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mihur</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@500;600;700;900&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-</file>
-
 <file path="src/components/CategoryCard.tsx">
 // src/components/CategoryCard.tsx
 import { Link } from 'react-router-dom';
@@ -1284,6 +1119,53 @@ createRoot(document.getElementById('root')!).render(
     </AuthProvider>
   </StrictMode>,
 );
+</file>
+
+<file path="package.json">
+{
+  "name": "mihur",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^1.29.0",
+    "@supabase/supabase-js": "^2.103.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "@vitejs/plugin-react": "^5.0.4",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.13.2",
+    "vite": "^6.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.21",
+    "supabase": "^2.102.0",
+    "tailwindcss": "^4.1.14",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  },
+  
+  "engines": {
+  "node": "20.x",
+  "npm": "10.x"
+}
+}
 </file>
 
 <file path="src/pages/CategoriesPage.tsx">
@@ -1360,192 +1242,393 @@ const CategoriesPage = () => {
 export default CategoriesPage;
 </file>
 
-<file path="package.json">
-{
-  "name": "mihur",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview",
-    "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@google/genai": "^1.29.0",
-    "@supabase/supabase-js": "^2.103.0",
-    "@tailwindcss/vite": "^4.1.14",
-    "@vitejs/plugin-react": "^5.0.4",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
-    "lucide-react": "^0.546.0",
-    "motion": "^12.23.24",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.13.2",
-    "vite": "^6.2.0"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^22.14.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "autoprefixer": "^10.4.21",
-    "supabase": "^2.102.0",
-    "tailwindcss": "^4.1.14",
-    "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
-  },
-  
-  "engines": {
-  "node": "20.x",
-  "npm": "10.x"
-}
-}
-</file>
-
-<file path="src/components/Navbar.tsx">
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+<file path="src/pages/RoadmapPage.tsx">
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle, Circle, Loader2, Plus, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { generateRoadmapLocal } from '../utils/roadmapGenerator';
 
-const NAV_LINKS = [
-  { label: 'Explore', to: '/' },
-  { label: 'Categories', to: '/categories' },
-  { label: 'My Learning', to: '/my-learning' },
-  { label: 'Questionnaire', to: '/questionnaire' },
-];
+interface Roadmap {
+  id: string;
+  title: string;
+  description: string;
+  progress_percent: number;
+  total_steps: number;
+  completed_steps: number;
+}
 
-const Navbar = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+interface Step {
+  id: string;
+  title: string;
+  description: string;
+  step_order: number;
+  is_completed: boolean;
+  estimated_hours: number;
+  course_id: string | null;
+}
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+const RoadmapPage = () => {
+  const { user } = useAuth();
+  const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
+  const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null);
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    fetchRoadmaps();
+  }, [user]);
+
+  const fetchRoadmaps = async () => {
+    const { data, error } = await supabase
+      .from('user_roadmaps')
+      .select('*')
+      .eq('user_id', user!.id)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Fetch roadmaps error:', error);
+      setError(error.message);
+    } else if (data) {
+      setRoadmaps(data);
+      if (data.length > 0 && !selectedRoadmap) {
+        setSelectedRoadmap(data[0]);
+        await fetchSteps(data[0].id);
+      }
+    }
+    setLoading(false);
   };
 
-  return (
-    <header className="navbar fixed top-0 left-0 right-0 z-50">
-      <div className="layout-container flex items-center justify-between gap-6">
-        <Link to="/" className="text-primary font-playfair headline-md">
-          Mihur
-        </Link>
+  const fetchSteps = async (roadmapId: string) => {
+    const { data, error } = await supabase
+      .from('roadmap_steps')
+      .select('*')
+      .eq('roadmap_id', roadmapId)
+      .order('step_order', { ascending: true });
+    
+    if (error) {
+      console.error('Fetch steps error:', error);
+      setError(error.message);
+    } else if (data) {
+      setSteps(data);
+    }
+  };
 
-        <nav className="hidden md:flex items-center gap-6">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              to={link.to}
-              className={`nav-link ${location.pathname === link.to ? 'active' : ''}`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+  const toggleStep = async (step: Step) => {
+    const newCompleted = !step.is_completed;
+    
+    // Optimistic update for steps and progress bar
+    setSteps(prevSteps => {
+      const updatedSteps = prevSteps.map(s =>
+        s.id === step.id ? { ...s, is_completed: newCompleted } : s
+      );
+      
+      // Immediately recalculate progress and update the selected roadmap UI
+      if (selectedRoadmap) {
+        const completedCount = updatedSteps.filter(s => s.is_completed).length;
+        const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
+        
+        setSelectedRoadmap(prev => prev ? {
+          ...prev,
+          completed_steps: completedCount,
+          progress_percent: progressPercent
+        } : null);
+      }
+      
+      return updatedSteps;
+    });
 
-        <div className="flex items-center gap-3">
-          {!user ? (
-            <>
-              <Link to="/auth" className="nav-link">
-                Sign in
-              </Link>
-              <Link to="/auth" className="btn-primary">
-                Get Started
-              </Link>
-            </>
-          ) : (
-            <div className="flex items-center gap-3">
-              <span className="text-secondary hidden md:block text-sm">
-                {user.email}
-              </span>
-              <button type="button" onClick={handleSignOut} className="btn-secondary">
-                Sign Out
-              </button>
-            </div>
-          )}
+    // Update database
+    const { error } = await supabase
+      .from('roadmap_steps')
+      .update({ 
+        is_completed: newCompleted,
+        completed_at: newCompleted ? new Date().toISOString() : null
+      })
+      .eq('id', step.id);
+
+    if (error) {
+      console.error('Toggle step error:', error);
+      // Revert optimistic update
+      setSteps(prevSteps =>
+        prevSteps.map(s =>
+          s.id === step.id ? { ...s, is_completed: !newCompleted } : s
+        )
+      );
+      if (selectedRoadmap) {
+        const revertedSteps = steps.map(s =>
+          s.id === step.id ? { ...s, is_completed: !newCompleted } : s
+        );
+        const completedCount = revertedSteps.filter(s => s.is_completed).length;
+        const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
+        setSelectedRoadmap({
+          ...selectedRoadmap,
+          completed_steps: completedCount,
+          progress_percent: progressPercent
+        });
+      }
+      return;
+    }
+
+    // After successful DB update, sync the roadmap progress in the database
+    if (selectedRoadmap) {
+      const updatedSteps = steps.map(s =>
+        s.id === step.id ? { ...s, is_completed: newCompleted } : s
+      );
+      const completedCount = updatedSteps.filter(s => s.is_completed).length;
+      const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
+      
+      await supabase
+        .from('user_roadmaps')
+        .update({ 
+          completed_steps: completedCount,
+          progress_percent: progressPercent
+        })
+        .eq('id', selectedRoadmap.id);
+    }
+  };
+
+  const generateRoadmap = async () => {
+    setGenerating(true);
+    setError(null);
+    
+    // Fetch user profile (questionnaire answers)
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('category, skill_level, goal, weekly_hours')
+      .eq('user_id', user!.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error('Profile fetch error:', profileError);
+      setError('Could not fetch your profile. Please try again.');
+      setGenerating(false);
+      return;
+    }
+
+    if (!profile || !profile.category) {
+      setError('Please complete the questionnaire first.');
+      setGenerating(false);
+      return;
+    }
+
+    try {
+      // Generate roadmap locally (no Edge Function, no Gemini)
+      const roadmapData = await generateRoadmapLocal({
+        user_id: user!.id,
+        category: profile.category,
+        skill_level: profile.skill_level,
+        goal: profile.goal,
+        weekly_hours: profile.weekly_hours,
+      });
+
+      // Insert roadmap into database
+      const { data: roadmap, error: roadmapError } = await supabase
+        .from('user_roadmaps')
+        .insert({
+          user_id: user!.id,
+          title: roadmapData.title,
+          description: roadmapData.description,
+          category_id: profile.category,
+          total_steps: roadmapData.steps.length,
+        })
+        .select()
+        .single();
+
+      if (roadmapError) throw roadmapError;
+
+      // Insert steps
+      const stepsWithOrder = roadmapData.steps.map((step, idx) => ({
+        roadmap_id: roadmap.id,
+        title: step.title,
+        description: step.description,
+        step_order: idx + 1,
+        estimated_hours: step.estimated_hours,
+        course_id: step.course_id,
+      }));
+
+      const { error: stepsError } = await supabase
+        .from('roadmap_steps')
+        .insert(stepsWithOrder);
+
+      if (stepsError) throw stepsError;
+
+      // Refresh the page
+      await fetchRoadmaps();
+      setSelectedRoadmap(roadmap);
+      await fetchSteps(roadmap.id);
+      
+    } catch (err: any) {
+      console.error('Roadmap generation error:', err);
+      setError('Failed to generate roadmap: ' + err.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin w-10 h-10 text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="pt-32 text-center px-4">
+        <div className="max-w-md mx-auto bg-surface-container-high rounded-3xl p-8">
+          <h2 className="text-3xl font-bold mb-4">Sign in to access your roadmap</h2>
+          <Link to="/auth" className="btn-primary">Sign In</Link>
         </div>
       </div>
-    </header>
+    );
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-6xl mx-auto min-h-screen">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
+        <div>
+          <h1 className="headline-lg font-playfair tracking-tight mb-2">Learning Roadmaps</h1>
+          <p className="body-md text-on-surface-variant">Track your progress toward your learning goals</p>
+        </div>
+        <button 
+          onClick={generateRoadmap}
+          disabled={generating}
+          className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
+        >
+          {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+          Generate New Roadmap
+        </button>
+      </div>
+
+      {error && (
+        <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
+          {error}
+        </div>
+      )}
+
+      {/* Roadmap Selector */}
+      {roadmaps.length > 0 && (
+        <div className="flex gap-4 mb-8 overflow-x-auto pb-4">
+          {roadmaps.map(roadmap => (
+            <button
+              key={roadmap.id}
+              onClick={() => {
+                setSelectedRoadmap(roadmap);
+                fetchSteps(roadmap.id);
+              }}
+              className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md ${
+                selectedRoadmap?.id === roadmap.id
+                  ? 'accent-gradient text-on-primary'
+                  : 'glass-card text-on-surface'
+              }`}
+            >
+              {roadmap.title}
+              <span className="ml-2 text-sm opacity-70">{roadmap.progress_percent}%</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Selected Roadmap */}
+      {selectedRoadmap && (
+        <motion.div key={selectedRoadmap.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="glass-card rounded-lg p-8 mb-8">
+            <h2 className="headline-md font-playfair mb-2">{selectedRoadmap.title}</h2>
+            <p className="text-on-surface-variant mb-6">{selectedRoadmap.description}</p>
+            
+            {/* Progress Bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span>Overall Progress</span>
+                <span>{selectedRoadmap.progress_percent}%</span>
+              </div>
+              <div className="progress-track">
+                <div 
+                  className="progress-fill transition-all duration-500"
+                  style={{ width: `${selectedRoadmap.progress_percent}%` }}
+                />
+              </div>
+            </div>
+            <p className="text-sm text-on-surface-variant">
+              {selectedRoadmap.completed_steps} of {selectedRoadmap.total_steps} steps completed
+            </p>
+          </div>
+
+          {/* Steps Checklist */}
+          <div className="space-y-4">
+            <h3 className="text-2xl font-bold mb-4">Learning Path</h3>
+            <AnimatePresence>
+              {steps.map((step) => (
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="glass-card rounded-lg p-5 border border-outline/20 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-start gap-4">
+                    <button onClick={() => toggleStep(step)} className="mt-1 flex-shrink-0">
+                      {step.is_completed ? (
+                        <CheckCircle className="w-6 h-6 text-primary" />
+                      ) : (
+                        <Circle className="w-6 h-6 text-on-surface-variant hover:text-primary transition-colors" />
+                      )}
+                    </button>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 flex-wrap mb-1">
+                        <span className="text-sm text-on-surface-variant font-mono">Step {step.step_order}</span>
+                        <span className="text-xs text-on-surface-variant">~{step.estimated_hours} hours</span>
+                      </div>
+                      <h4 className={`headline-md font-playfair mb-1 ${step.is_completed ? 'line-through text-on-surface-variant' : ''}`}>
+                        {step.title}
+                      </h4>
+                      <p className="text-on-surface-variant text-sm">{step.description}</p>
+                      {step.course_id && (
+                        <Link 
+                          to={`/category/${step.course_id}`}
+                          className="inline-flex items-center gap-1 text-primary text-sm mt-3 hover:underline"
+                        >
+                          View Recommended Course <TrendingUp className="w-3 h-3" />
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
+
+      {roadmaps.length === 0 && !generating && !error && (
+        <div className="text-center py-20 bg-surface-container-high rounded-3xl">
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <TrendingUp className="w-10 h-10 text-primary" />
+          </div>
+          <h3 className="text-2xl font-bold mb-2">No roadmaps yet</h3>
+          <p className="text-on-surface-variant mb-8 max-w-md mx-auto">
+            Complete the questionnaire to get a personalized learning roadmap.
+          </p>
+          <Link to="/questionnaire" className="btn-primary">
+            Complete Questionnaire
+          </Link>
+        </div>
+      )}
+    </motion.div>
   );
 };
 
-export default Navbar;
-</file>
-
-<file path="src/App.tsx">
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import CategoriesPage from './pages/CategoriesPage';
-import CategoryDetailPage from './pages/CategoryDetailPage';
-import QuestionnairePage from './pages/Questionaire';
-import AuthPage from './pages/AuthPage';
-import MyLearningPage from './pages/MyLearningPage';
-import RoadmapPage from './pages/RoadmapPage';
-
-
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-surface-dim text-on-surface">
-        <Navbar />
-
-        <main className="pt-24">
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/categories" element={<CategoriesPage />} />
-              <Route path="/category/:id" element={<CategoryDetailPage />} />
-              <Route path="/questionnaire" element={<QuestionnairePage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/my-learning" element={<MyLearningPage />} />
-             <Route path="/roadmap" element={<RoadmapPage />} />
-            </Routes>
-          </AnimatePresence>
-        </main>
-
-        <footer className="bg-surface-dim border-t border-outline-variant py-20">
-          <div className="layout-container flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <Link to="/" className="text-xl font-semibold text-primary tracking-tight">
-                Mihur
-              </Link>
-              <p className="text-muted text-xs uppercase tracking-[0.2em] mt-2">
-                © 2026 Mihur • Built for focused learning
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-6 text-sm text-secondary">
-              <Link to="/categories" className="nav-link">
-                Categories
-              </Link>
-              <Link to="/my-learning" className="nav-link">
-                My Courses
-              </Link>
-              <Link to="/" className="nav-link">
-                About
-              </Link>
-              <Link to="/questionnaire" className='nav-link'>
-                Questionnaire
-              </Link>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </BrowserRouter>
-  );
-}
+export default RoadmapPage;
 </file>
 
 <file path="src/components/CourseCard.tsx">
@@ -1695,6 +1778,149 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 supabase.auth.onAuthStateChange((event, session) => {
   console.log('🔐 Supabase Auth Event:', event, session?.user?.email);
 });
+</file>
+
+<file path="src/App.tsx">
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
+import CategoriesPage from './pages/CategoriesPage';
+import CategoryDetailPage from './pages/CategoryDetailPage';
+import QuestionnairePage from './pages/Questionaire';
+import AuthPage from './pages/AuthPage';
+import MyLearningPage from './pages/MyLearningPage';
+import RoadmapPage from './pages/RoadmapPage';
+import { GraduationCap } from 'lucide-react';
+
+
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen bg-surface-dim text-on-surface">
+        <Navbar />
+
+        <main className="pt-24">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/categories" element={<CategoriesPage />} />
+              <Route path="/category/:id" element={<CategoryDetailPage />} />
+              <Route path="/questionnaire" element={<QuestionnairePage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/my-learning" element={<MyLearningPage />} />
+             <Route path="/roadmap" element={<RoadmapPage />} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+
+        <footer className="bg-surface-dim border-t border-outline-variant py-20">
+          <div className="layout-container flex flex-col md:flex-row justify-between items-center gap-6">
+          <div>
+  <Link to="/" className="flex items-center gap-2 text-primary font-semibold text-xl tracking-tight">
+    <GraduationCap className="w-6 h-6" />
+    <span>Mihur</span>
+  </Link>
+  <p className="text-muted text-xs uppercase tracking-[0.2em] mt-2">
+    © 2026 Mihur • Built for focused learning
+  </p>
+</div>
+            <div className="flex flex-wrap gap-6 text-sm text-secondary">
+              <Link to="/categories" className="nav-link">
+                Categories
+              </Link>
+              <Link to="/my-learning" className="nav-link">
+                My Courses
+              </Link>
+              <Link to="/" className="nav-link">
+                About
+              </Link>
+              <Link to="/questionnaire" className='nav-link'>
+                Questionnaire
+              </Link>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </BrowserRouter>
+  );
+}
+</file>
+
+<file path="src/components/Navbar.tsx">
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { GraduationCap } from 'lucide-react';
+
+const NAV_LINKS = [
+  { label: 'Explore', to: '/' },
+  { label: 'Categories', to: '/categories' },
+  { label: 'My Learning', to: '/my-learning' },
+  { label: 'Roadmap', to: '/roadmap' },      // ← add this line
+  { label: 'Questionnaire', to: '/questionnaire' },
+];
+const Navbar = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  return (
+    <header className="navbar fixed top-0 left-0 right-0 z-50">
+      <div className="layout-container flex items-center justify-between gap-6">
+      <Link to="/" className="flex items-center gap-2 text-primary font-playfair headline-md">
+  <GraduationCap className="w-7 h-7 text-primary" />
+  <span>Mihur</span>
+</Link>
+        <nav className="hidden md:flex items-center gap-6">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              to={link.to}
+              className={`nav-link ${location.pathname === link.to ? 'active' : ''}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          {!user ? (
+            <>
+              <Link to="/auth" className="nav-link">
+                Sign in
+              </Link>
+              <Link to="/auth" className="btn-primary">
+                Get Started
+              </Link>
+            </>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="text-secondary hidden md:block text-sm">
+                {user.email}
+              </span>
+              <button type="button" onClick={handleSignOut} className="btn-secondary">
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;
 </file>
 
 <file path="src/pages/CategoryDetailPage.tsx">
@@ -1850,70 +2076,31 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Search State
   const [searchQuery, setSearchQuery] = useState('');
-  
 
   useEffect(() => {
-    // Add this at the top of HomePage component
-const testSupabase = async () => {
-  console.log('Testing Supabase connection...');
-  const { data: cats, error: catErr } = await supabase.from('categories').select('id').limit(1);
-  console.log('Categories test:', catErr ? 'ERROR' : 'OK', catErr?.message);
-  
-  const { data: coursesTest, error: courseErr } = await supabase.from('courses').select('id').limit(1);
-  console.log('Courses test:', courseErr ? 'ERROR' : 'OK', courseErr?.message);
-  
-  const { data: profilesTest, error: profErr } = await supabase.from('user_profiles').select('user_id').limit(1);
-  console.log('User_profiles test:', profErr ? 'ERROR' : 'OK', profErr?.message);
-  
-  const { data: savedTest, error: savedErr } = await supabase.from('saved_courses').select('id').limit(1);
-  console.log('Saved_courses test:', savedErr ? 'ERROR' : 'OK', savedErr?.message);
-};
-
-// Call it inside useEffect, after fetchData or before
-testSupabase();
     const fetchData = async () => {
-      // 1. Fetch Categories and Courses
       const [catResponse, courseResponse] = await Promise.all([
         supabase.from('categories').select('*').limit(6),
-        supabase.from('courses').select('*') // Fetches all so we can search them
+        supabase.from('courses').select('*')
       ]);
 
-      if (catResponse.error) {
-        console.error('Categories fetch failed', catResponse.error);
-        setError(catResponse.error.message);
-      }
-      if (courseResponse.error) {
-        console.error('Courses fetch failed', courseResponse.error);
-        setError(courseResponse.error.message);
-      }
+      if (catResponse.error) console.error('Categories fetch failed', catResponse.error);
+      if (courseResponse.error) console.error('Courses fetch failed', courseResponse.error);
       if (catResponse.data) setCategories(catResponse.data);
       if (courseResponse.data) setCourses(courseResponse.data);
 
-      // 2. PHASE 6: Recommendation Engine
       if (user) {
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile } = await supabase
           .from('user_profiles')
           .select('category, skill_level')
           .eq('user_id', user.id)
-          .limit(1)
           .maybeSingle();
-
-        if (profileError) {
-          console.error('Profile fetch failed', profileError);
-          // User profile lookup should not stop the main course listing from rendering.
-        }
 
         if (profile && profile.category) {
           let query = supabase.from('courses').select('*').eq('category_id', profile.category);
           if (profile.skill_level) query = query.eq('level', profile.skill_level);
-          
-          const { data: recommendations, error: recommendationsError } = await query.limit(4);
-          if (recommendationsError) {
-            console.error('Recommendations fetch failed', recommendationsError);
-            setError(recommendationsError.message);
-          }
+          const { data: recommendations } = await query.limit(4);
           if (recommendations) setRecommendedCourses(recommendations);
         }
       }
@@ -1923,18 +2110,13 @@ testSupabase();
     fetchData();
   }, [user]);
 
-  // Search Filter Logic
   const filteredCourses = courses.filter(course => 
     course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     course.provider.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-10 h-10 text-primary" />
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
   }
 
   if (error) {
@@ -1950,16 +2132,21 @@ testSupabase();
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      {/* Hero Section */}
-      <section className="page-section max-w-7xl mx-auto text-center relative">
+      {/* Hero Section with sunset decorations */}
+      <section className="page-section max-w-7xl mx-auto text-center relative overflow-hidden">
+        {/* Sunset decorations – all inside hero-decor */}
         <div className="hero-decor">
           <div className="sunset-circle" />
           <div className="sunset-blob" />
+          <div className="sunset-bubble-1" />
+          <div className="sunset-bubble-2" />
+          <div className="sunset-bubble-3" />
         </div>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="display-lg font-playfair tracking-tight mb-8 max-w-4xl mx-auto leading-[0.95] text-on-surface"
+          className="display-lg font-playfair tracking-tight mb-8 max-w-4xl mx-auto leading-[0.95] text-on-surface relative z-10"
         >
           Find the Best Free Courses, Fast
         </motion.h1>
@@ -1967,16 +2154,15 @@ testSupabase();
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="body-lg text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed"
+          className="body-lg text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed relative z-10"
         >
           Discover thousands of free courses from Coursera, edX, Khan Academy, and FutureLearn in one place.
         </motion.p>
 
-        {/* Working Search Bar */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-3xl mx-auto relative group"
+          className="max-w-3xl mx-auto relative group z-10"
         >
           <div className="flex items-center bg-surface-container-highest rounded-2xl p-2 ghost-border group-focus-within:ring-2 group-focus-within:ring-primary/30 transition-all duration-300 editorial-shadow">
             <Search className="ml-4 w-6 h-6 text-on-surface-variant" />
@@ -1991,7 +2177,7 @@ testSupabase();
         </motion.div>
       </section>
 
-      {/* Recommended Section (PHASE 6) - ONLY shows if logged in AND has profile */}
+      {/* Recommended Section */}
       {user && recommendedCourses.length > 0 && !searchQuery && (
         <section className="page-section max-w-7xl mx-auto">
           <div className="mb-12 flex items-center justify-between bg-primary/10 p-8 rounded-3xl border border-primary/20">
@@ -2014,7 +2200,7 @@ testSupabase();
         </section>
       )}
 
-      {/* Categories Section - Hides when searching */}
+      {/* Categories Section */}
       {!searchQuery && (
         <section className="bg-surface-container-low page-section">
           <div className="max-w-7xl mx-auto px-4 sm:px-8">
@@ -2034,7 +2220,7 @@ testSupabase();
         </section>
       )}
 
-      {/* Courses Section (Updates based on search!) */}
+      {/* Courses Section */}
       <section className="page-section max-w-7xl mx-auto">
         <div className="mb-10">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
@@ -2050,7 +2236,6 @@ testSupabase();
           </div>
         ) : (
           <div className="text-center py-20 text-on-surface-variant">
-            {/* HERE IS THE LINE THAT WAS BROKEN! IT NOW HAS THE CLOSING TAG properly -> /> */}
             <Search className="w-12 h-12 mx-auto mb-4 opacity-20" />
             <p className="text-xl">No courses found matching "{searchQuery}"</p>
           </div>
@@ -2061,6 +2246,140 @@ testSupabase();
 };
 
 export default HomePage;
+</file>
+
+<file path="src/pages/AuthPage.tsx">
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { supabase } from '../lib/supabase';
+
+const AuthPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (isLogin) {
+        // Clear any existing session first
+        await supabase.auth.signOut();
+        
+        // Sign in
+        const { error } = await supabase.auth.signInWithPassword({ 
+          email, 
+          password 
+        });
+        
+        if (error) throw error;
+        
+        // Force hard reload to home page
+        window.location.href = '/';
+        
+      } else {
+        // Sign up
+        const { error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: { 
+            emailRedirectTo: window.location.origin 
+          }
+        });
+        
+        if (error) throw error;
+        
+        alert('Check your email for the confirmation link!');
+        setEmail('');
+        setPassword('');
+      }
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="page-section px-4"
+    >
+      <div className="max-w-md mx-auto">
+        <div className="glass-card rounded-lg p-8 shadow-xl border border-outline/20">
+          <h1 className="headline-md font-playfair text-center mb-8">
+            {isLogin ? 'Welcome Back' : 'Create Account'}
+          </h1>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleAuth} className="space-y-5">
+            <div>
+              <label className="block label-md mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
+                placeholder="you@example.com"
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label className="block label-md mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
+                placeholder="••••••••"
+                disabled={loading}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-xl btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-sm text-primary hover:underline transition-all"
+              disabled={loading}
+            >
+              {isLogin 
+                ? "Don't have an account? Sign up" 
+                : "Already have an account? Sign in"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default AuthPage;
 </file>
 
 <file path="src/pages/Questionaire.tsx">
@@ -2153,13 +2472,14 @@ const QuestionnairePage = () => {
 
     setSaving(false);
     
-    if (!error) {
-      setSaved(true);
-      // Hide the "Saved!" message after 3 seconds
-      setTimeout(() => setSaved(false), 3000);
-    } else {
-      alert('Error saving preferences: ' + error.message);
-    }
+  if (!error) {
+  setSaved(true);
+  setTimeout(() => {
+    setSaved(false);
+    // Redirect to roadmap page after successful save
+    window.location.href = '/roadmap';
+  }, 1500);
+}
   };
 
   const reset = () => {
@@ -2346,7 +2666,7 @@ export default QuestionnairePage;
 @import "tailwindcss";
 
 @theme {
-  --color-surface-dim: #2E2E41; /* Dark background requested */
+  --color-surface-dim: #2E2E41;
   --color-surface-bright: #363646;
   --color-surface-container-lowest: #222230;
   --color-surface-container-low: #262634;
@@ -2354,15 +2674,15 @@ export default QuestionnairePage;
   --color-surface-container-high: #333348;
   --color-surface-container-highest: #3b3b56;
   
-  --color-on-surface: #F6F5F4; /* light text */
+  --color-on-surface: #F6F5F4;
   --color-on-surface-variant: #cfc9c6;
   
-  --color-primary: #FB6D10; /* main warm accent */
+  --color-primary: #FB6D10;
   --color-primary-dim: #d55a0d;
   --color-primary-container: #ff8b3a;
   --color-on-primary: #ffffff;
   
-  --color-secondary: #EB3E1B; /* secondary warm accent */
+  --color-secondary: #EB3E1B;
   --color-secondary-container: #ff6a3a;
   --color-on-secondary-container: #ffffff;
   
@@ -2556,6 +2876,10 @@ body {
   filter: brightness(0.95);
 }
 
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* ------------------ DESIGN SYSTEM (from DESIGN.md) ------------------ */
 
 /* Font utilities */
@@ -2576,7 +2900,21 @@ body {
 .rounded-lg { border-radius: 1rem; }
 .rounded-xl { border-radius: 1.5rem; }
 
-/* Sunset decorative elements */
+/* ========== SUNSET DECORATIONS ========== */
+.hero-decor {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+  isolation: isolate;
+}
+
+/* Ensure hero section creates a stacking context */
+section.relative {
+  isolation: isolate;
+}
+
 .sunset-circle {
   position: absolute;
   width: 680px;
@@ -2585,19 +2923,51 @@ body {
   filter: blur(60px);
   right: -180px;
   top: -200px;
-  background: var(--sunset-gradient, linear-gradient(135deg, #FB6D10 0%, #EB3E1B 50%, #2E2E41 100%));
-  opacity: 0.75;
-  pointer-events: none;
+  background: linear-gradient(135deg, #FB6D10 0%, #EB3E1B 50%, #2E2E41 100%);
+  opacity: 0.65;
+  z-index: -1;
 }
 
-.hero-decor {
+.sunset-bubble-1 {
   position: absolute;
-  inset: 0;
-  display: block;
-  pointer-events: none;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251,109,16,0.4), rgba(235,62,27,0.2));
+  filter: blur(70px);
+  left: -150px;
+  bottom: -100px;
+  opacity: 0.5;
+  z-index: -1;
 }
 
-.sunset-blob {
+.sunset-bubble-2 {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,179,122,0.3), rgba(251,109,16,0.1));
+  filter: blur(55px);
+  right: 15%;
+  top: 40%;
+  opacity: 0.45;
+  z-index: -1;
+}
+
+.sunset-bubble-3 {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(235,62,27,0.2);
+  filter: blur(40px);
+  left: 5%;
+  bottom: 15%;
+  opacity: 0.35;
+  z-index: -1;
+}
+
+.hero-decor .sunset-blob {
   position: absolute;
   width: 420px;
   height: 420px;
@@ -2606,10 +2976,11 @@ body {
   filter: blur(48px);
   left: -90px;
   bottom: -120px;
-  opacity: 0.85;
+  opacity: 0.7;
+  z-index: -1;
 }
 
-/* Glass card base following DESIGN.md */
+/* Glass card base */
 .glass-card {
   background: rgba(255,255,255,0.03);
   backdrop-filter: blur(12px);
@@ -2657,12 +3028,20 @@ body {
   .display-lg { font-size: 34px; line-height: 42px; }
   .headline-lg { font-size: 28px; line-height: 36px; }
   .headline-md { font-size: 20px; line-height: 28px; }
-  .hero-decor .sunset-circle {
+  .sunset-circle {
     width: 520px;
     height: 520px;
     right: -130px;
     top: -140px;
     filter: blur(50px);
+    opacity: 0.55;
+  }
+  .sunset-bubble-1 {
+    width: 320px;
+    height: 320px;
+    left: -80px;
+    bottom: -60px;
+    filter: blur(45px);
   }
   .hero-decor .sunset-blob {
     width: 320px;
@@ -2670,7 +3049,14 @@ body {
     left: -60px;
     bottom: -80px;
     filter: blur(40px);
-    opacity: 0.72;
+    opacity: 0.6;
+  }
+  .sunset-bubble-2 {
+    width: 240px;
+    height: 240px;
+    right: 5%;
+    top: 30%;
+    filter: blur(35px);
   }
   .btn-primary, .btn-secondary {
     width: 100%;
@@ -2687,146 +3073,6 @@ body {
     padding: 4.5rem 2rem 3rem;
   }
 }
-
-/* End design system */
-
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-</file>
-
-<file path="src/pages/AuthPage.tsx">
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { supabase } from '../lib/supabase';
-
-const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (isLogin) {
-        // Clear any existing session first
-        await supabase.auth.signOut();
-        
-        // Sign in
-        const { error } = await supabase.auth.signInWithPassword({ 
-          email, 
-          password 
-        });
-        
-        if (error) throw error;
-        
-        // Force hard reload to home page
-        window.location.href = '/';
-        
-      } else {
-        // Sign up
-        const { error } = await supabase.auth.signUp({ 
-          email, 
-          password,
-          options: { 
-            emailRedirectTo: window.location.origin 
-          }
-        });
-        
-        if (error) throw error;
-        
-        alert('Check your email for the confirmation link!');
-        setEmail('');
-        setPassword('');
-      }
-    } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="page-section px-4"
-    >
-      <div className="max-w-md mx-auto">
-        <div className="glass-card rounded-lg p-8 shadow-xl border border-outline/20">
-          <h1 className="headline-md font-playfair text-center mb-8">
-            {isLogin ? 'Welcome Back' : 'Create Account'}
-          </h1>
-
-          {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleAuth} className="space-y-5">
-            <div>
-              <label className="block label-md mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
-                placeholder="you@example.com"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label className="block label-md mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border border-outline/20 input-glow"
-                placeholder="••••••••"
-                disabled={loading}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:underline transition-all"
-              disabled={loading}
-            >
-              {isLogin 
-                ? "Don't have an account? Sign up" 
-                : "Already have an account? Sign in"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-export default AuthPage;
 </file>
 
 </files>
