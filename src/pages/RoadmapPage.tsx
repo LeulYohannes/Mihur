@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Circle, Loader2, Plus, TrendingUp, X } from 'lucide-react';
+import { CheckCircle, Circle, Loader2, Plus, TrendingUp, X, Heart, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { generateRoadmapLocal } from '../utils/roadmapGenerator';
+import { generateRoadmapLocal, GeneratedRoadmap } from '../utils/roadmapGenerator';
 
 interface Roadmap {
   id: string;
@@ -23,6 +23,16 @@ interface Step {
   is_completed: boolean;
   estimated_hours: number;
   course_id: string | null;
+  external_url?: string | null;
+  thumbnail?: string | null;
+  url?: string | null;
+}
+
+interface Video {
+  title: string;
+  description: string;
+  url: string;
+  thumbnail: string;
 }
 
 const RoadmapPage = () => {
@@ -30,9 +40,23 @@ const RoadmapPage = () => {
   const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
   const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchFavorites = async () => {
+      const { data } = await supabase
+        .from('user_favorites')
+        .select('external_url')
+        .eq('user_id', user.id);
+      if (data) setFavorites(new Set(data.map((f: any) => f.external_url)));
+    };
+    fetchFavorites();
+  }, [user]);
 
   useEffect(() => {
     if (!user) {
@@ -43,174 +67,99 @@ const RoadmapPage = () => {
   }, [user]);
 
   const fetchRoadmaps = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('user_roadmaps')
       .select('*')
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Fetch roadmaps error:', error);
-      setError(error.message);
-    } else if (data) {
+    if (data) {
       setRoadmaps(data);
       if (data.length > 0 && !selectedRoadmap) {
         setSelectedRoadmap(data[0]);
         await fetchSteps(data[0].id);
-      } else if (data.length === 0) {
-        setSelectedRoadmap(null);
-        setSteps([]);
       }
     }
     setLoading(false);
   };
 
   const fetchSteps = async (roadmapId: string) => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('roadmap_steps')
       .select('*')
       .eq('roadmap_id', roadmapId)
       .order('step_order', { ascending: true });
-    
-    if (error) {
-      console.error('Fetch steps error:', error);
-      setError(error.message);
-    } else if (data) {
-      setSteps(data);
-    }
+    if (data) setSteps(data);
   };
 
   const deleteRoadmap = async (roadmapId: string, roadmapTitle: string) => {
-    if (!confirm(`Are you sure you want to delete the roadmap "${roadmapTitle}"? This action cannot be undone.`)) {
-      return;
-    }
-
-    // Optimistic update – remove from UI immediately
-    setRoadmaps(prevRoadmaps => {
-      const updated = prevRoadmaps.filter(r => r.id !== roadmapId);
-      
-      // Handle selection change if needed
-      if (selectedRoadmap?.id === roadmapId) {
-        if (updated.length > 0) {
-          setSelectedRoadmap(updated[0]);
-          fetchSteps(updated[0].id);
-        } else {
-          setSelectedRoadmap(null);
-          setSteps([]);
-        }
+    if (!confirm(`Delete "${roadmapTitle}"?`)) return;
+    setRoadmaps(prev => prev.filter(r => r.id !== roadmapId));
+    if (selectedRoadmap?.id === roadmapId) {
+      const remaining = roadmaps.filter(r => r.id !== roadmapId);
+      if (remaining.length > 0) {
+        setSelectedRoadmap(remaining[0]);
+        await fetchSteps(remaining[0].id);
+      } else {
+        setSelectedRoadmap(null);
+        setSteps([]);
+        setVideos([]);
       }
-      
-      return updated;
-    });
-
-    // Delete from database
-    const { error } = await supabase
-      .from('user_roadmaps')
-      .delete()
-      .eq('id', roadmapId);
-
-    if (error) {
-      console.error('Delete roadmap error:', error);
-      setError('Failed to delete roadmap. Please try again.');
-      // Revert optimistic update by refetching
-      await fetchRoadmaps();
     }
+    await supabase.from('user_roadmaps').delete().eq('id', roadmapId);
   };
 
   const toggleStep = async (step: Step) => {
     const newCompleted = !step.is_completed;
-    
-    setSteps(prevSteps => {
-      const updatedSteps = prevSteps.map(s =>
-        s.id === step.id ? { ...s, is_completed: newCompleted } : s
-      );
-      
-      if (selectedRoadmap) {
-        const completedCount = updatedSteps.filter(s => s.is_completed).length;
-        const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
-        
-        setSelectedRoadmap(prev => prev ? {
-          ...prev,
-          completed_steps: completedCount,
-          progress_percent: progressPercent
-        } : null);
-      }
-      
-      return updatedSteps;
-    });
-
-    const { error } = await supabase
-      .from('roadmap_steps')
-      .update({ 
-        is_completed: newCompleted,
-        completed_at: newCompleted ? new Date().toISOString() : null
-      })
-      .eq('id', step.id);
-
-    if (error) {
-      console.error('Toggle step error:', error);
-      setSteps(prevSteps =>
-        prevSteps.map(s =>
-          s.id === step.id ? { ...s, is_completed: !newCompleted } : s
-        )
-      );
-      if (selectedRoadmap) {
-        const revertedSteps = steps.map(s =>
-          s.id === step.id ? { ...s, is_completed: !newCompleted } : s
-        );
-        const completedCount = revertedSteps.filter(s => s.is_completed).length;
-        const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
-        setSelectedRoadmap({
-          ...selectedRoadmap,
-          completed_steps: completedCount,
-          progress_percent: progressPercent
-        });
-      }
-      return;
-    }
-
+    setSteps(prev => prev.map(s => s.id === step.id ? { ...s, is_completed: newCompleted } : s));
     if (selectedRoadmap) {
-      const updatedSteps = steps.map(s =>
-        s.id === step.id ? { ...s, is_completed: newCompleted } : s
-      );
+      const updatedSteps = steps.map(s => s.id === step.id ? { ...s, is_completed: newCompleted } : s);
       const completedCount = updatedSteps.filter(s => s.is_completed).length;
       const progressPercent = Math.round((completedCount / selectedRoadmap.total_steps) * 100);
-      
+      setSelectedRoadmap(prev => prev ? { ...prev, completed_steps: completedCount, progress_percent: progressPercent } : null);
       await supabase
         .from('user_roadmaps')
-        .update({ 
-          completed_steps: completedCount,
-          progress_percent: progressPercent
-        })
+        .update({ completed_steps: completedCount, progress_percent: progressPercent })
         .eq('id', selectedRoadmap.id);
+    }
+    await supabase
+      .from('roadmap_steps')
+      .update({ is_completed: newCompleted, completed_at: newCompleted ? new Date().toISOString() : null })
+      .eq('id', step.id);
+  };
+
+  const toggleFavorite = async (video: Video) => {
+    const isFav = favorites.has(video.url);
+    if (isFav) {
+      await supabase.from('user_favorites').delete().eq('user_id', user!.id).eq('external_url', video.url);
+      setFavorites(prev => { const newSet = new Set(prev); newSet.delete(video.url); return newSet; });
+    } else {
+      await supabase.from('user_favorites').insert({
+        user_id: user!.id,
+        external_url: video.url,
+        title: video.title,
+        thumbnail: video.thumbnail,
+      });
+      setFavorites(prev => new Set(prev).add(video.url));
     }
   };
 
   const generateRoadmap = async () => {
     setGenerating(true);
     setError(null);
-    
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('category, skill_level, goal, weekly_hours')
       .eq('user_id', user!.id)
       .maybeSingle();
 
-    if (profileError) {
-      console.error('Profile fetch error:', profileError);
-      setError('Could not fetch your profile. Please try again.');
-      setGenerating(false);
-      return;
-    }
-
-    if (!profile || !profile.category) {
+    if (!profile?.category) {
       setError('Please complete the questionnaire first.');
       setGenerating(false);
       return;
     }
 
     try {
-      const roadmapData = await generateRoadmapLocal({
+      const roadmapData: GeneratedRoadmap = await generateRoadmapLocal({
         user_id: user!.id,
         category: profile.category,
         skill_level: profile.skill_level,
@@ -218,6 +167,7 @@ const RoadmapPage = () => {
         weekly_hours: profile.weekly_hours,
       });
 
+      // Save roadmap
       const { data: roadmap, error: roadmapError } = await supabase
         .from('user_roadmaps')
         .insert({
@@ -225,175 +175,107 @@ const RoadmapPage = () => {
           title: roadmapData.title,
           description: roadmapData.description,
           category_id: profile.category,
-          total_steps: roadmapData.steps.length,
+          total_steps: roadmapData.dbCourses.length,
         })
         .select()
         .single();
-
       if (roadmapError) throw roadmapError;
 
-      const stepsWithOrder = roadmapData.steps.map((step, idx) => ({
+      // Save steps from DB courses
+      const stepsWithOrder = roadmapData.dbCourses.map((course, idx) => ({
         roadmap_id: roadmap.id,
-        title: step.title,
-        description: step.description,
+        title: course.title,
+        description: course.description,
         step_order: idx + 1,
-        estimated_hours: step.estimated_hours,
-        course_id: step.course_id,
+        estimated_hours: course.estimated_hours,
+        course_id: course.course_id,
+        external_url: null,
+        thumbnail: null,
+        url: course.url,
       }));
-
-      const { error: stepsError } = await supabase
-        .from('roadmap_steps')
-        .insert(stepsWithOrder);
-
+      const { error: stepsError } = await supabase.from('roadmap_steps').insert(stepsWithOrder);
       if (stepsError) throw stepsError;
+
+      // Save YouTube videos separately (not as steps, but store in a new table? We'll just pass to UI)
+      // For now, we'll keep videos in state (they are not saved to database, only shown after generation)
+      setVideos(roadmapData.youtubeVideos);
 
       await fetchRoadmaps();
       setSelectedRoadmap(roadmap);
       await fetchSteps(roadmap.id);
-      
     } catch (err: any) {
-      console.error('Roadmap generation error:', err);
-      setError('Failed to generate roadmap: ' + err.message);
+      setError(err.message);
     } finally {
       setGenerating(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-10 h-10 text-primary" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="pt-32 text-center px-4">
-        <div className="max-w-md mx-auto bg-surface-container-high rounded-3xl p-8">
-          <h2 className="text-3xl font-bold mb-4">Sign in to access your roadmap</h2>
-          <Link to="/auth" className="btn-primary">Sign In</Link>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen flex justify-center items-center"><Loader2 className="animate-spin w-10 h-10 text-primary" /></div>;
+  if (!user) return <div className="pt-32 text-center"><Link to="/auth" className="btn-primary">Sign In</Link></div>;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="page-section max-w-6xl mx-auto min-h-screen">
-      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
+      <div className="flex justify-between items-center mb-12">
         <div>
-          <h1 className="headline-lg font-playfair tracking-tight mb-2">Learning Roadmaps</h1>
-          <p className="body-md text-on-surface-variant">Track your progress toward your learning goals</p>
+          <h1 className="headline-lg font-playfair">Learning Roadmaps</h1>
+          <p className="body-md text-on-surface-variant">Track progress and discover recommended videos</p>
         </div>
-        <button 
-          onClick={generateRoadmap}
-          disabled={generating}
-          className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
-        >
-          {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+        <button onClick={generateRoadmap} disabled={generating} className="btn-primary flex gap-2">
+          {generating ? <Loader2 className="animate-spin w-5 h-5" /> : <Plus className="w-5 h-5" />}
           Generate New Roadmap
         </button>
       </div>
 
-      {error && (
-        <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
-          {error}
-        </div>
-      )}
+      {error && <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">{error}</div>}
 
-      {/* Roadmap Selector with visible X buttons */}
+      {/* Roadmap Selector */}
       {roadmaps.length > 0 && (
         <div className="flex flex-wrap gap-4 mb-8">
-          {roadmaps.map(roadmap => (
-            <div key={roadmap.id} className="flex items-center gap-1">
+          {roadmaps.map(rm => (
+            <div key={rm.id} className="flex items-center gap-1">
               <button
-                onClick={() => {
-                  setSelectedRoadmap(roadmap);
-                  fetchSteps(roadmap.id);
-                }}
-                className={`px-6 py-3 rounded-xl whitespace-nowrap transition-all label-md ${
-                  selectedRoadmap?.id === roadmap.id
-                    ? 'accent-gradient text-on-primary'
-                    : 'glass-card text-on-surface'
-                }`}
+                onClick={() => { setSelectedRoadmap(rm); fetchSteps(rm.id); }}
+                className={`px-6 py-3 rounded-xl label-md ${selectedRoadmap?.id === rm.id ? 'accent-gradient text-on-primary' : 'glass-card'}`}
               >
-                {roadmap.title}
-                <span className="ml-2 text-sm opacity-70">{roadmap.progress_percent}%</span>
+                {rm.title} <span className="ml-2 text-sm">{rm.progress_percent}%</span>
               </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteRoadmap(roadmap.id, roadmap.title);
-                }}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Delete roadmap"
-              >
-                <X className="w-4 h-4 text-on-surface-variant hover:text-red-400" />
-              </button>
+              <button onClick={() => deleteRoadmap(rm.id, rm.title)} className="p-2 rounded-full hover:bg-white/10"><X className="w-4 h-4" /></button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Selected Roadmap */}
+      {/* Roadmap Steps (only from DB courses) */}
       {selectedRoadmap && (
-        <motion.div key={selectedRoadmap.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div key={selectedRoadmap.id}>
           <div className="glass-card rounded-lg p-8 mb-8">
-            <h2 className="headline-md font-playfair mb-2">{selectedRoadmap.title}</h2>
+            <h2 className="headline-md font-playfair">{selectedRoadmap.title}</h2>
             <p className="text-on-surface-variant mb-6">{selectedRoadmap.description}</p>
-            
-            <div className="mb-4">
-              <div className="flex justify-between text-sm mb-2">
-                <span>Overall Progress</span>
-                <span>{selectedRoadmap.progress_percent}%</span>
-              </div>
-              <div className="progress-track">
-                <div 
-                  className="progress-fill transition-all duration-500"
-                  style={{ width: `${selectedRoadmap.progress_percent}%` }}
-                />
-              </div>
-            </div>
-            <p className="text-sm text-on-surface-variant">
-              {selectedRoadmap.completed_steps} of {selectedRoadmap.total_steps} steps completed
-            </p>
+            <div className="mb-2 flex justify-between text-sm"><span>Progress</span><span>{selectedRoadmap.progress_percent}%</span></div>
+            <div className="progress-track"><div className="progress-fill" style={{ width: `${selectedRoadmap.progress_percent}%` }} /></div>
+            <p className="text-sm mt-2">{selectedRoadmap.completed_steps} of {selectedRoadmap.total_steps} steps completed</p>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold mb-4">Learning Path</h3>
+            <h3 className="text-2xl font-bold">Learning Path</h3>
             <AnimatePresence>
-              {steps.map((step) => (
-                <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="glass-card rounded-lg p-5 border border-outline/20 hover:shadow-lg transition-all"
-                >
+              {steps.map(step => (
+                <motion.div key={step.id} className="glass-card rounded-lg p-5">
                   <div className="flex items-start gap-4">
-                    <button onClick={() => toggleStep(step)} className="mt-1 flex-shrink-0">
-                      {step.is_completed ? (
-                        <CheckCircle className="w-6 h-6 text-primary" />
-                      ) : (
-                        <Circle className="w-6 h-6 text-on-surface-variant hover:text-primary transition-colors" />
-                      )}
+                    <button onClick={() => toggleStep(step)} className="mt-1">
+                      {step.is_completed ? <CheckCircle className="w-6 h-6 text-primary" /> : <Circle className="w-6 h-6 text-on-surface-variant" />}
                     </button>
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 flex-wrap mb-1">
+                      <div className="flex items-center gap-3 mb-1">
                         <span className="text-sm text-on-surface-variant font-mono">Step {step.step_order}</span>
                         <span className="text-xs text-on-surface-variant">~{step.estimated_hours} hours</span>
                       </div>
-                      <h4 className={`headline-md font-playfair mb-1 ${step.is_completed ? 'line-through text-on-surface-variant' : ''}`}>
-                        {step.title}
-                      </h4>
+                      <h4 className={`headline-md font-playfair ${step.is_completed ? 'line-through text-on-surface-variant' : ''}`}>{step.title}</h4>
                       <p className="text-on-surface-variant text-sm">{step.description}</p>
-                      {step.course_id && (
-                        <Link 
-                          to={`/category/${step.course_id}`}
-                          className="inline-flex items-center gap-1 text-primary text-sm mt-3 hover:underline"
-                        >
-                          View Recommended Course <TrendingUp className="w-3 h-3" />
-                        </Link>
+                      {step.url && (
+                        <a href={step.url} target="_blank" rel="noopener noreferrer" className="btn-secondary text-sm py-1 px-3 inline-block mt-3">
+                          View Recommended Course <ExternalLink className="w-3 h-3 inline ml-1" />
+                        </a>
                       )}
                     </div>
                   </div>
@@ -404,18 +286,36 @@ const RoadmapPage = () => {
         </motion.div>
       )}
 
-      {roadmaps.length === 0 && !generating && !error && (
-        <div className="text-center py-20 bg-surface-container-high rounded-3xl">
-          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <TrendingUp className="w-10 h-10 text-primary" />
+      {/* Recommended Videos Section (always shown after generation) */}
+      {videos.length > 0 && (
+        <div className="mt-12">
+          <h3 className="text-2xl font-bold mb-4">Recommended Videos for You</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {videos.map((video, idx) => (
+              <div key={idx} className="glass-card rounded-lg overflow-hidden hover:shadow-xl transition-all">
+                {video.thumbnail && <img src={video.thumbnail} alt={video.title} className="w-full h-40 object-cover" />}
+                <div className="p-5">
+                  <h4 className="headline-md font-playfair mb-2 line-clamp-2">{video.title}</h4>
+                  <p className="text-on-surface-variant text-sm mb-3 line-clamp-2">{video.description}</p>
+                  <div className="flex items-center justify-between">
+                    <a href={video.url} target="_blank" rel="noopener noreferrer" className="btn-secondary text-sm py-1 px-3 flex items-center gap-1">
+                      Watch on YouTube <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <button onClick={() => toggleFavorite(video)} className="p-1 rounded-full hover:bg-white/10">
+                      {favorites.has(video.url) ? <Heart className="w-5 h-5 fill-red-500 text-red-500" /> : <Heart className="w-5 h-5 text-on-surface-variant" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <h3 className="text-2xl font-bold mb-2">No roadmaps yet</h3>
-          <p className="text-on-surface-variant mb-8 max-w-md mx-auto">
-            Complete the questionnaire to get a personalized learning roadmap.
-          </p>
-          <Link to="/questionnaire" className="btn-primary">
-            Complete Questionnaire
-          </Link>
+        </div>
+      )}
+
+      {roadmaps.length === 0 && !generating && !error && (
+        <div className="text-center py-20">
+          <p className="text-on-surface-variant mb-4">No roadmaps yet. Generate one to start learning!</p>
+          <button onClick={generateRoadmap} className="btn-primary">Create Your First Roadmap</button>
         </div>
       )}
     </motion.div>

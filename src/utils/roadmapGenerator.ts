@@ -8,39 +8,76 @@ interface GenerateRoadmapParams {
   weekly_hours: number;
 }
 
-interface GeneratedRoadmap {
+export interface GeneratedRoadmap {
   title: string;
   description: string;
-  steps: {
+  dbCourses: {
     title: string;
     description: string;
     estimated_hours: number;
-    course_id: string | null;
+    course_id: string;
+    url: string;
   }[];
+  youtubeVideos: {
+    title: string;
+    description: string;
+    url: string;
+    thumbnail: string;
+  }[];
+}
+
+function parseDurationHours(duration: string): number {
+  const match = duration.match(/\d+/);
+  return match ? parseInt(match[0], 10) : 5;
+}
+
+async function searchYouTube(query: string, maxResults = 3): Promise<any[]> {
+  try {
+    const { data, error } = await supabase.functions.invoke('search-youtube', {
+      body: JSON.stringify({ query, maxResults }),
+    });
+    if (error || !data?.success) return [];
+    return data.videos || [];
+  } catch (err) {
+    console.error('YouTube search failed', err);
+    return [];
+  }
 }
 
 export async function generateRoadmapLocal(params: GenerateRoadmapParams): Promise<GeneratedRoadmap> {
   const { category, skill_level, goal, weekly_hours } = params;
-  
-  // Fetch courses in the chosen category, filtered by skill level
+
+  // Fetch courses from DB, sorted by level (Beginner → Intermediate → Advanced)
   let { data: courses } = await supabase
     .from('courses')
     .select('*')
     .eq('category_id', category)
-    .eq('level', skill_level)
-    .limit(10);
-  
-  // If no courses at that level, fallback to any level in the same category
+    .order('level', { ascending: true });
+
   if (!courses || courses.length === 0) {
-    const { data: fallbackCourses } = await supabase
+    const { data: fallback } = await supabase
       .from('courses')
       .select('*')
       .eq('category_id', category)
       .limit(10);
-    courses = fallbackCourses || [];
+    courses = fallback || [];
   }
-  
-  // Category name mapping for nicer titles
+
+  // Prefer courses matching user's skill level, then others
+  const preferred = courses.filter(c => c.level === skill_level);
+  const other = courses.filter(c => c.level !== skill_level);
+  const sortedCourses = [...preferred, ...other];
+
+  // Limit to at most 6 DB courses
+  const dbCourses = sortedCourses.slice(0, 6).map(course => ({
+    title: course.title,
+    description: course.description.substring(0, 120),
+    estimated_hours: parseDurationHours(course.duration),
+    course_id: course.id,
+    url: course.url,
+  }));
+
+  // Search YouTube for up to 3 relevant videos
   const categoryNames: Record<string, string> = {
     tech: 'Technology',
     business: 'Business',
@@ -52,31 +89,12 @@ export async function generateRoadmapLocal(params: GenerateRoadmapParams): Promi
     health: 'Health',
     math: 'Mathematics',
   };
-  
   const categoryName = categoryNames[category] || category;
+  const searchQuery = `${categoryName} ${skill_level} tutorial ${goal.substring(0, 40)}`;
+  const youtubeVideos = await searchYouTube(searchQuery, 3);
+
   const title = `${skill_level} ${categoryName} Roadmap: ${goal.substring(0, 60)}${goal.length > 60 ? '...' : ''}`;
-  const totalEstimatedHours = weekly_hours * 4; // approximate 4 weeks
-  const description = `A structured learning path to help you achieve "${goal}". Estimated total time: ~${totalEstimatedHours} hours.`;
-  
-  // Generate steps from available courses
-  const steps = courses.slice(0, 6).map((course) => ({
-    title: course.title,
-    description: course.description.substring(0, 120),
-    estimated_hours: Math.max(4, Math.min(20, Math.floor(totalEstimatedHours / 6))),
-    course_id: course.id,
-  }));
-  
-  // If we don't have enough courses, add generic learning steps
-  if (steps.length < 4) {
-    const genericSteps = [
-      { title: `Fundamentals of ${categoryName}`, description: `Learn the core concepts and principles of ${categoryName}.`, estimated_hours: 8, course_id: null },
-      { title: 'Hands‑on Practice', description: 'Apply your knowledge with practical exercises and projects.', estimated_hours: 12, course_id: null },
-      { title: 'Intermediate Topics', description: 'Dive deeper into advanced concepts and techniques.', estimated_hours: 15, course_id: null },
-      { title: 'Final Project', description: 'Build a real‑world project to demonstrate your skills.', estimated_hours: 20, course_id: null },
-    ];
-    const needed = 6 - steps.length;
-    steps.push(...genericSteps.slice(0, needed));
-  }
-  
-  return { title, description, steps };
+  const description = `A structured learning path to help you achieve "${goal}". Estimated total time: ~${weekly_hours * 4} hours.`;
+
+  return { title, description, dbCourses, youtubeVideos };
 }
